@@ -1,0 +1,10 @@
+pandas
+numpy
+seaborn
+matplotlib
+requests
+sqlite3
+dotenv
+sqlalchemy
+psycopg2
+datetime
