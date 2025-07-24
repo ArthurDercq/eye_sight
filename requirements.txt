@@ -8,3 +8,4 @@ dotenv
 sqlalchemy
 psycopg2
 datetime
+json

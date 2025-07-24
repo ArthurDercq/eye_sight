@@ -1,4 +1,5 @@
 import pandas as pd
+import json
 
 
 def convert_hours_to_hms(hours):
@@ -60,6 +61,8 @@ def clean_data(df):
     activities_df_cleaned['moving_time_hms'] = activities_df_cleaned['moving_time'].apply(convert_hours_to_hms)
     activities_df_cleaned['elapsed_time_hms'] = activities_df_cleaned['elapsed_time'].apply(convert_hours_to_hms)
     print("Format temps HH:MM:SS ✅")
+
+    activities_df_cleaned["map"] = activities_df_cleaned["map"].apply(json.dumps)
 
 
     print(" Les données ont été nettoyées avec succès ✅")

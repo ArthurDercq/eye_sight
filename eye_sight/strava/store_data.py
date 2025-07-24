@@ -87,7 +87,8 @@ def store_df_in_postgresql(db_path):
     pr_count INTEGER,
     has_kudoed BOOLEAN,
     average_watts FLOAT,
-    kilojoules FLOAT
+    kilojoules FLOAT,
+    map JSONB
 );
 """).format(sql.Identifier(table_name))
 
@@ -102,9 +103,9 @@ def store_df_in_postgresql(db_path):
             kudos_count, gear_id, start_latlng, end_latlng, average_speed,
             max_speed, average_cadence, average_temp, has_heartrate,
             average_heartrate, max_heartrate, elev_high, elev_low, pr_count,
-            has_kudoed, average_watts, kilojoules
+            has_kudoed, average_watts, kilojoules, map
         ) VALUES (
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     )
         """).format(sql.Identifier(table_name))
 
@@ -118,7 +119,7 @@ def store_df_in_postgresql(db_path):
         row['average_cadence'], row['average_temp'], row['has_heartrate'],
         row['average_heartrate'], row['max_heartrate'], row['elev_high'],
         row['elev_low'], row['pr_count'], row['has_kudoed'],
-        row['average_watts'], row['kilojoules']
+        row['average_watts'], row['kilojoules'], row["map"]
     ))
 
     # Valider les changements
