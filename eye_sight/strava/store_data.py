@@ -33,12 +33,12 @@ def store_df_in_sqlite(df, db_path, table_name='activities'):
 
 
 
-def store_df_in_postgresql(db_path):
+def store_df_in_postgresql(df, host, database, user, password, port):
 
     creation_date = datetime.now().strftime('%Y-%m-%d')
 
     # Lire le fichier CSV dans un DataFrame pandas
-    df = pd.read_csv(db_path)
+    #df = pd.read_csv(db_path)
 
     # Connexion à la base de données PostgreSQL
     # Remplacez les valeurs par vos informations de connexion PostgreSQL
