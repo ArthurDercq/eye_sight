@@ -54,7 +54,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
     cur = conn.cursor()
 
     # Nom de la table dans laquelle vous allez importer les données
-    table_name = f"activities_{datetime}"
+    table_name = "dashboard"
 
     # Créer la table dans PostgreSQL
     # Assurez-vous que les types de données correspondent à ceux de votre CSV
@@ -76,6 +76,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
     start_latlng VARCHAR(50),
     end_latlng VARCHAR(50),
     average_speed FLOAT,
+    speed_minutes_per_km FLOAT,
     max_speed FLOAT,
     average_cadence FLOAT,
     average_temp FLOAT,
@@ -100,12 +101,12 @@ def store_df_in_postgresql(df, host, database, user, password, port):
         INSERT INTO {} (
             name, distance, moving_time, elapsed_time, total_elevation_gain,
             sport_type, start_date, start_date_local, timezone, achievement_count,
-            kudos_count, gear_id, start_latlng, end_latlng, average_speed,
+            kudos_count, gear_id, start_latlng, end_latlng, average_speed, speed_minutes_per_km,
             max_speed, average_cadence, average_temp, has_heartrate,
             average_heartrate, max_heartrate, elev_high, elev_low, pr_count,
             has_kudoed, average_watts, kilojoules, map
         ) VALUES (
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     )
         """).format(sql.Identifier(table_name))
 
@@ -115,7 +116,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
         row['total_elevation_gain'], row['sport_type'], row['start_date'],
         row['start_date_local'], row['timezone'], row['achievement_count'],
         row['kudos_count'], row['gear_id'], str(row['start_latlng']),
-        str(row['end_latlng']), row['average_speed'], row['max_speed'],
+        str(row['end_latlng']), row['average_speed'], row["speed_minutes_per_km"], row['max_speed'],
         row['average_cadence'], row['average_temp'], row['has_heartrate'],
         row['average_heartrate'], row['max_heartrate'], row['elev_high'],
         row['elev_low'], row['pr_count'], row['has_kudoed'],
