@@ -17,6 +17,10 @@ def convert_hours_to_hms(hours):
 
 # Fonction pour nettoyer les données
 def clean_data(df):
+
+    # Copier le DataFrame pour ne pas modifier l'original
+    activities_df_cleaned = df.copy()
+
     # Liste des colonnes à supprimer
     columns_to_drop = [
     'resource_state', 'athlete', 'type', 'workout_type', 'utc_offset',
@@ -27,8 +31,7 @@ def clean_data(df):
     'from_accepted_tag', 'total_photo_count'
     ]
     # Suppression des colonnes non pertinentes du DataFrame
-    activities_df_cleaned = df.drop(columns=columns_to_drop, axis=1,
-    inplace=True)
+    activities_df_cleaned.drop(columns=columns_to_drop, axis=1, inplace=True)
     print("Colonnes ✅")
 
     # Conversion de la colonne 'distance' de mètres en kilomètres
@@ -36,7 +39,7 @@ def clean_data(df):
     print("Distance convertie ✅")
 
     # Définir la colonne 'id' comme index
-    activities_df_cleaned = activities_df_cleaned.set_index('id', inplace=True)
+    activities_df_cleaned.set_index('id', inplace=True)
     print("Index id ✅")
 
 
@@ -62,10 +65,11 @@ def clean_data(df):
     activities_df_cleaned['elapsed_time_hms'] = activities_df_cleaned['elapsed_time'].apply(convert_hours_to_hms)
     print("Format temps HH:MM:SS ✅")
 
+    # Sérialisation du champ map
     activities_df_cleaned["map"] = activities_df_cleaned["map"].apply(json.dumps)
 
 
-    print(" Les données ont été nettoyées avec succès ✅")
+    print("Les données ont été nettoyées avec succès ✅")
 
 
     return activities_df_cleaned
