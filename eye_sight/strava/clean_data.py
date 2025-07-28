@@ -2,17 +2,18 @@ import pandas as pd
 import json
 
 
-def convert_hours_to_hms(hours):
-    # Convertir les heures en secondes
-    total_seconds = int(hours * 3600)
+def convert_minutes_to_hms(minutes):
 
-    # Calculer les heures, minutes et secondes
+    if minutes is None or not isinstance(minutes, (int, float)):
+        return "00:00:00"
+    if minutes < 0:
+        minutes = abs(minutes)
+
+    total_seconds = int(minutes * 60)
     h = total_seconds // 3600
     remainder = total_seconds % 3600
     m = remainder // 60
     s = remainder % 60
-
-    # Retourner le format HH:MM:SS
     return f"{h:02}:{m:02}:{s:02}"
 
 # Fonction pour nettoyer les données
@@ -61,8 +62,8 @@ def clean_data(df):
 
 
     # Ajouter une nouvelle colonne avec le format HH:MM:SS pour 'moving_time' et 'elapsed_time'
-    activities_df_cleaned['moving_time_hms'] = activities_df_cleaned['moving_time'].apply(convert_hours_to_hms)
-    activities_df_cleaned['elapsed_time_hms'] = activities_df_cleaned['elapsed_time'].apply(convert_hours_to_hms)
+    activities_df_cleaned['moving_time_hms'] = activities_df_cleaned['moving_time'].apply(convert_minutes_to_hms)
+    activities_df_cleaned['elapsed_time_hms'] = activities_df_cleaned['elapsed_time'].apply(convert_minutes_to_hms)
     print("Format temps HH:MM:SS ✅")
 
     # Sérialisation du champ map
