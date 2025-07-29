@@ -7,8 +7,8 @@ from eye_sight.params import *
 
 # Fonction pour récupérer les données depuis l'API Strava
 def fetch_strava_data():
-    auth_url = "https://www.strava.com/oauth/token"
-    activites_url = "https://www.strava.com/api/v3/athlete/activities"
+    auth_url = AUTH_URL
+    activites_url = ACTIVITIES_URL
 
     # Obtenir la date actuelle
     creation_date = datetime.now().strftime('%Y-%m-%d')
@@ -64,8 +64,8 @@ def fetch_strava_data():
 
 
 def update_strava_data():
-    auth_url = "https://www.strava.com/oauth/token"
-    activites_url = "https://www.strava.com/api/v3/athlete/activities"
+    auth_url = AUTH_URL
+    activites_url = ACTIVITIES_URL
 
     # Obtenir la date actuelle
     creation_date = datetime.now().strftime('%Y-%m-%d')

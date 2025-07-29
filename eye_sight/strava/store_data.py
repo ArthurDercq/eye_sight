@@ -101,7 +101,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
     # Préparer les données
     values = [
         (
-            row['name'], row['distance'], row['moving_time'], row['elapsed_time'],
+            row['id'] ,row['name'], row['distance'], row['moving_time'], row['elapsed_time'],
             row["moving_time_hms"], row["elapsed_time_hms"],
             row['total_elevation_gain'], row['sport_type'], row['start_date'],
             row['start_date_local'], row['timezone'], row['achievement_count'],
@@ -117,7 +117,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
 
     # Colonnes à insérer (ne pas inclure id)
     columns = (
-        'name', 'distance', 'moving_time', 'elapsed_time','moving_time_hms', 'elapsed_time_hms',
+        'id','name', 'distance', 'moving_time', 'elapsed_time','moving_time_hms', 'elapsed_time_hms',
         'total_elevation_gain',
         'sport_type', 'start_date', 'start_date_local', 'timezone',
         'achievement_count', 'kudos_count', 'gear_id', 'start_latlng', 'end_latlng',
@@ -130,6 +130,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
     insert_query = sql.SQL("""
         INSERT INTO {} ({})
         VALUES %s
+        ON CONFLICT (id) DO NOTHING
     """).format(
         sql.Identifier(table_name),
         sql.SQL(', ').join(map(sql.Identifier, columns))
