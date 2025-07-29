@@ -7,11 +7,9 @@ from eye_sight.params import *
 
 # Fonction pour récupérer les données depuis l'API Strava
 def fetch_strava_data():
-    auth_url = AUTH_URL
-    activites_url = ACTIVITIES_URL
 
     # Obtenir la date actuelle
-    creation_date = datetime.now().strftime('%Y-%m-%d')
+    #creation_date = datetime.now().strftime('%Y-%m-%d')
 
     payload = {
     'client_id': STRAVA_CLIENT_ID,
@@ -22,7 +20,7 @@ def fetch_strava_data():
     }
 
     print("Requesting Token...\n")
-    res = requests.post(auth_url, data=payload, verify=False)
+    res = requests.post(AUTH_URL, data=payload, verify=False)
     access_token = res.json()['access_token']
     print("Access Token = {}\n".format(access_token))
 
@@ -35,28 +33,24 @@ def fetch_strava_data():
     page = 1
     while True:
         param = {'per_page': 200, 'page': page}
-        activities = requests.get(activites_url, headers=header, params=param).json()
+        activities = requests.get(ACTIVITES_URL, headers=header, params=param).json()
 
         # Si aucune activité n'est retournée, on arrête la boucle
         if not activities:
             break
 
-    # Ajout des activités à la liste
-    all_activities.extend(activities)
+        # Ajout des activités à la liste
+        all_activities.extend(activities)
 
-    # Incrémentation du numéro de page
-    page += 1
+        print(f"📄 Page {page}…")
+        # Incrémentation du numéro de page
+        page += 1
 
     # Conversion en DataFrame pandas
     activities_df = pd.DataFrame(all_activities)
 
-    # Sauvegarde en fichier CSV
-    #csv_file_path = f'../data/strava_activities_raw_{creation_date}.csv'
-    #activities_df.to_csv(csv_file_path, index=False)
 
     print("Données récupérées de l'API Strava ✅")
-
-    #print(f"Les données ont aussi été sauvegardées en .csv dans {csv_file_path} ✅")
 
     return activities_df
 
@@ -64,11 +58,6 @@ def fetch_strava_data():
 
 
 def update_strava_data():
-    auth_url = AUTH_URL
-    activites_url = ACTIVITIES_URL
-
-    # Obtenir la date actuelle
-    creation_date = datetime.now().strftime('%Y-%m-%d')
 
     payload = {
     'client_id': STRAVA_CLIENT_ID,
@@ -79,7 +68,7 @@ def update_strava_data():
     }
 
     print("Requesting Token...\n")
-    res = requests.post(auth_url, data=payload, verify=False)
+    res = requests.post(AUTH_URL, data=payload, verify=False)
     access_token = res.json()['access_token']
     print("Access Token = {}\n".format(access_token))
 
@@ -87,7 +76,7 @@ def update_strava_data():
     params = {'per_page': 10, 'page': 1}
 
     print("📥 Fetching last 10 activities from Strava...")
-    response = requests.get(activites_url, headers=header, params=params)
+    response = requests.get(ACTIVITES_URL, headers=header, params=params, timeout=30)
     response.raise_for_status()
     activities = response.json()
 
@@ -96,5 +85,5 @@ def update_strava_data():
         return pd.DataFrame()
 
     df = pd.DataFrame(activities)
-    print(f"✅ {len(df)} activities retrieved from Strava.")
+    print(f"✅ {len(df)} last activities retrieved from Strava.")
     return df

@@ -32,16 +32,12 @@ def clean_data(df):
     'from_accepted_tag', 'total_photo_count'
     ]
     # Suppression des colonnes non pertinentes du DataFrame
-    activities_df_cleaned.drop(columns=columns_to_drop, axis=1, inplace=True)
+    activities_df_cleaned.drop(columns=columns_to_drop, inplace=True)
     print("Colonnes ✅")
 
     # Conversion de la colonne 'distance' de mètres en kilomètres
     activities_df_cleaned['distance'] = activities_df_cleaned['distance'] / 1000
     print("Distance convertie ✅")
-
-    # Définir la colonne 'id' comme index
-    activities_df_cleaned.set_index('id', inplace=True)
-    print("Index id ✅")
 
 
     # Conversion des colonnes 'moving_time' et 'elapsed_time' de secondes en minutes

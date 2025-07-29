@@ -3,7 +3,6 @@ from eye_sight.strava.clean_data import *
 from eye_sight.strava.fetch_strava import *
 from eye_sight.params import *
 
-load_dotenv("/Users/arthurdercq/code/Data Science/Garmin_Dashboard/.env")
 
 def main():
 
@@ -15,6 +14,9 @@ def main():
 
     store_df_in_postgresql(clean_df, host=HOST, database=DATABASE, user=USER, password=PASSWORD, port=PORT)
 
+def main_test():
+
+    update_strava_data()
 
 if __name__ == '__main__':
 

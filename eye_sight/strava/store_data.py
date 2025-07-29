@@ -39,13 +39,6 @@ def store_df_in_sqlite(df, db_path, table_name='activities'):
 
 def store_df_in_postgresql(df, host, database, user, password, port):
 
-    # Lire le fichier CSV
-    #df = pd.read_csv(db_path)
-
-    # Supprimer la colonne 'id' si elle existe
-    if 'id' in df.columns:
-        df = df.drop(columns=['id'])
-
     # Connexion à la DB
     conn = connect(
         host=host,
@@ -141,6 +134,5 @@ def store_df_in_postgresql(df, host, database, user, password, port):
 
     conn.commit()
     cur.close()
-    conn.close()
 
     print("✅ Données importées dans PostgreSQL.")
