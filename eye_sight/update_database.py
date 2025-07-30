@@ -11,10 +11,6 @@ def get_existing_activity_ids(engine):
     with engine.connect() as conn:
         result = conn.execute(text(query))
         return set(row[0] for row in result.fetchall())
-
-
-
-
 def check_schema_compatibility(engine, df, table_name="dashboard"):
     inspector = inspect(engine)
     columns_in_db = [col["name"] for col in inspector.get_columns(table_name)]
@@ -36,10 +32,6 @@ def check_schema_compatibility(engine, df, table_name="dashboard"):
         return False
 
     return True
-
-
-
-
 def update_activities():
     engine = create_engine(DB_URI)
 
