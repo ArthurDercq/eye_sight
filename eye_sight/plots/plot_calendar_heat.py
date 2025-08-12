@@ -4,7 +4,7 @@ import calmap
 import matplotlib.pyplot as plt
 import pandas as pd
 
-ACTIVITY_FORMAT = "%b %d, %Y, %H:%M:%S %p"
+
 
 
 def plot_calendar(
@@ -18,6 +18,7 @@ def plot_calendar(
 ):
     # Create a new figure
     plt.figure()
+    ACTIVITY_FORMAT = "%b %d, %Y, %H:%M:%S %p"
 
     # Process data
     df["start_date"] = pd.to_datetime(
@@ -40,4 +41,6 @@ def plot_calendar(
     # Save plot
     fig.set_figheight(fig_height)
     fig.set_figwidth(fig_width)
-    fig.savefig(output_file, dpi=600)
+    #fig.savefig(output_file, dpi=600)
+
+    return fig
