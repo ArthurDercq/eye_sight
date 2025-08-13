@@ -1,5 +1,5 @@
 from eye_sight.main import *
-from eye_sight.update_database import update_database
+from eye_sight.update_database import *
 import streamlit as st
 from sqlalchemy import create_engine, text
 from eye_sight.params import *
@@ -20,13 +20,16 @@ def load_data():
     return df
 
 
-# Refresh des données en appuyant sur bouton
-# Bouton
+# Appel des données et refresh en appuyant sur un bouton
 if st.button("Rafraichir mes données"):
-    update_database()
+    message = update_database()
+    st.success(message, icon="🔥")
+    load_data.clear()      # Vide le cache pour forcer un rechargement
+    df = load_data()
 
-#Appel des données
-df = load_data()
+else:
+    df = load_data()
+
 
 
 # Trier par date décroissante et garder les 5 plus récentes
@@ -34,9 +37,9 @@ df_recent = df.sort_values(by="start_date", ascending=False).head(5)
 
 
 # ---- SIDEBAR ----
-st.sidebar.header("Please Filter Here:")
+st.sidebar.header("Filtre ici 👇🏼 ")
 sport = st.sidebar.multiselect(
-    "Select the sport:",
+    "Sélectionne ton sport:",
     options=df["sport_type"].unique()
 )
 
@@ -53,7 +56,7 @@ st.markdown("##")
 left_column, middle_column, right_column = st.columns(3)
 with left_column:
     st.subheader("Dernière activité")
-    dernier = df.sort_values(by="start_date", ascending=False).iloc[1]
+    dernier = df.sort_values(by="start_date", ascending=False).iloc[0]
     st.write(f"**Type de sport :** {dernier['sport_type']}")
     st.write(f"**Distance :** {dernier['distance']:.2f} km")
     st.write(f"**Temps en mouvement :** {dernier['moving_time_hms']} s")

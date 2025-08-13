@@ -16,6 +16,17 @@ def convert_minutes_to_hms(minutes):
     s = remainder % 60
     return f"{h:02}:{m:02}:{s:02}"
 
+
+def format_pace(speed_kmh):
+
+    if pd.isna(speed_kmh) or speed_kmh == 0:
+        return None
+    total_minutes = 60 / speed_kmh
+    minutes = int(total_minutes)
+    seconds = int(round((total_minutes - minutes) * 60))
+    return f"{minutes}:{seconds:02d}"  # format mm:ss
+
+
 # Fonction pour nettoyer les données
 def clean_data(df):
 
@@ -32,7 +43,7 @@ def clean_data(df):
     'from_accepted_tag', 'total_photo_count'
     ]
     # Suppression des colonnes non pertinentes du DataFrame
-    activities_df_cleaned.drop(columns=columns_to_drop, inplace=True)
+    activities_df_cleaned.drop(columns=columns_to_drop, errors='ignore', inplace=True)
     print("Colonnes ✅")
 
     # Conversion de la colonne 'distance' de mètres en kilomètres
@@ -53,7 +64,7 @@ def clean_data(df):
 
 
     # Ajouter une nouvelle colonne 'minutes_per_km' qui convertit 'average_speed' en minutes par kilomètre
-    activities_df_cleaned['speed_minutes_per_km'] = 60 / activities_df_cleaned['average_speed']
+    activities_df_cleaned['speed_minutes_per_km'] = activities_df_cleaned['average_speed'].apply(format_pace)
     print("min/km colonne ✅")
 
 
@@ -65,6 +76,22 @@ def clean_data(df):
     # Sérialisation du champ map
     activities_df_cleaned["map"] = activities_df_cleaned["map"].apply(json.dumps)
 
+    required_columns = [
+    'id', 'name', 'distance', 'moving_time', 'moving_time_hms',
+    'elapsed_time_hms', 'start_date', 'type', 'sport_type', 'workout_type',
+    'total_elevation_gain', 'start_latitude', 'start_longitude', 'end_latitude',
+    'end_longitude', 'location_city', 'location_state', 'location_country',
+    'achievement_count', 'kudos_count', 'comment_count', 'athlete_count',
+    'photo_count', 'trainer', 'commute', 'manual', 'private', 'visibility',
+    'max_speed', 'average_cadence', 'average_temp', 'has_heartrate',
+    'average_heartrate', 'max_heartrate', 'elev_high', 'elev_low', 'pr_count',
+    'has_kudoed', 'average_watts', 'kilojoules', 'map'
+]
+
+# Ajouter les colonnes manquantes avec None
+    for col in required_columns:
+        if col not in activities_df_cleaned.columns:
+            activities_df_cleaned[col] = None
 
     print("Les données ont été nettoyées avec succès ✅")
 

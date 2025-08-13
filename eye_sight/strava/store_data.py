@@ -22,12 +22,7 @@ def normalize_sport_type(sport):
     return mapping.get(sport, sport)
 
 
-def store_df_in_csv(df, db_path):
 
-    # Exporter le DataFrame nettoyé en fichier CSV
-    df.to_csv(db_path, index=False)
-
-    print("Database sauvegardée en csv ✅")
 
 
 
@@ -79,7 +74,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
         start_latlng VARCHAR(50),
         end_latlng VARCHAR(50),
         average_speed FLOAT,
-        speed_minutes_per_km FLOAT,
+        speed_minutes_per_km INTERVAL,
         max_speed FLOAT,
         average_cadence FLOAT,
         average_temp FLOAT,
@@ -115,7 +110,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
         for _, row in df.iterrows()
     ]
 
-    # Colonnes à insérer (ne pas inclure id)
+    # Colonnes à insérer
     columns = (
         'id','name', 'distance', 'moving_time', 'elapsed_time','moving_time_hms', 'elapsed_time_hms',
         'total_elevation_gain',
@@ -126,6 +121,11 @@ def store_df_in_postgresql(df, host, database, user, password, port):
         'elev_high', 'elev_low', 'pr_count', 'has_kudoed', 'average_watts',
         'kilojoules', 'map'
     )
+
+    for col in columns:
+        if col not in df.columns:
+            print(f"[DEBUG] Colonne manquante ajoutée: {col}")
+            df[col] = None
 
     insert_query = sql.SQL("""
         INSERT INTO {} ({})
