@@ -14,6 +14,13 @@ from eye_sight.params import *
 from datetime import datetime
 
 
+def normalize_sport_type(sport):
+    mapping = {
+        "Ride": "Bike",
+        "TrainRun": "Trail"
+    }
+    return mapping.get(sport, sport)
+
 
 def store_df_in_csv(df, db_path):
 
@@ -57,10 +64,10 @@ def store_df_in_postgresql(df, host, database, user, password, port):
         id BIGSERIAL PRIMARY KEY,
         name VARCHAR(255),
         distance FLOAT,
-        moving_time INTEGER,
-        elapsed_time INTEGER,
-        moving_time_hms VARCHAR(20),
-        elapsed_time_hms VARCHAR(20),
+        moving_time FLOAT,
+        elapsed_time FLOAT,
+        moving_time_hms INTERVAL,
+        elapsed_time_hms INTERVAL,
         total_elevation_gain FLOAT,
         sport_type VARCHAR(255),
         start_date TIMESTAMP,
@@ -96,7 +103,7 @@ def store_df_in_postgresql(df, host, database, user, password, port):
         (
             row['id'] ,row['name'], row['distance'], row['moving_time'], row['elapsed_time'],
             row["moving_time_hms"], row["elapsed_time_hms"],
-            row['total_elevation_gain'], row['sport_type'], row['start_date'],
+            row['total_elevation_gain'], normalize_sport_type(row['sport_type']), row['start_date'],
             row['start_date_local'], row['timezone'], row['achievement_count'],
             row['kudos_count'], row['gear_id'], str(row['start_latlng']),
             str(row['end_latlng']), row['average_speed'], row['speed_minutes_per_km'],
@@ -135,4 +142,4 @@ def store_df_in_postgresql(df, host, database, user, password, port):
     conn.commit()
     cur.close()
 
-    print("✅ Données importées dans PostgreSQL.")
+    print("Données importées dans PostgreSQL ✅")
