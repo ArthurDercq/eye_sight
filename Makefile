@@ -3,8 +3,8 @@
 install_requirements:
 	@pip install -r requirements.txt
 
-init:
-	python eye_sight/main.py
+create:
+	python eye_sight/create_database.py
 
 update:
 	python eye_sight/update_database.py

@@ -3,15 +3,14 @@ from eye_sight.strava.clean_data import clean_data
 from eye_sight.strava.store_data import store_df_in_postgresql
 from eye_sight.params import *
 from sqlalchemy import create_engine, text
-import requests
-import pandas as pd
+
 
 
 def get_last_activity_date():
 
     engine = create_engine(DB_URI)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT MAX(start_date) FROM dashboard")) #choppe la dernière date d'acti
+        result = conn.execute(text(f"SELECT MAX(start_date) FROM {TABLE_NAME}")) #choppe la dernière date d'acti
         last_date = result.scalar()
     return last_date
 

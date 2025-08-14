@@ -21,10 +21,7 @@ def format_pace(speed_kmh):
 
     if pd.isna(speed_kmh) or speed_kmh == 0:
         return None
-    total_minutes = 60 / speed_kmh
-    minutes = int(total_minutes)
-    seconds = int(round((total_minutes - minutes) * 60))
-    return f"{minutes}:{seconds:02d}"  # format mm:ss
+    return 60 / speed_kmh  # retourne un float (minutes par km)
 
 
 # Fonction pour nettoyer les données
@@ -65,8 +62,10 @@ def clean_data(df):
 
     # Ajouter une nouvelle colonne 'minutes_per_km' qui convertit 'average_speed' en minutes par kilomètre
     activities_df_cleaned['speed_minutes_per_km'] = activities_df_cleaned['average_speed'].apply(format_pace)
+    # Colonne pour affichage format mm:ss
+    activities_df_cleaned['speed_minutes_per_km_hms'] = activities_df_cleaned['speed_minutes_per_km'] \
+    .apply(lambda x: f"{int(x)}:{int(round((x % 1) * 60)):02d}" if pd.notnull(x) else None)
     print("min/km colonne ✅")
-
 
     # Ajouter une nouvelle colonne avec le format HH:MM:SS pour 'moving_time' et 'elapsed_time'
     activities_df_cleaned['moving_time_hms'] = activities_df_cleaned['moving_time'].apply(convert_minutes_to_hms)
@@ -77,15 +76,14 @@ def clean_data(df):
     activities_df_cleaned["map"] = activities_df_cleaned["map"].apply(json.dumps)
 
     required_columns = [
-    'id', 'name', 'distance', 'moving_time', 'moving_time_hms',
-    'elapsed_time_hms', 'start_date', 'type', 'sport_type', 'workout_type',
-    'total_elevation_gain', 'start_latitude', 'start_longitude', 'end_latitude',
-    'end_longitude', 'location_city', 'location_state', 'location_country',
-    'achievement_count', 'kudos_count', 'comment_count', 'athlete_count',
-    'photo_count', 'trainer', 'commute', 'manual', 'private', 'visibility',
-    'max_speed', 'average_cadence', 'average_temp', 'has_heartrate',
-    'average_heartrate', 'max_heartrate', 'elev_high', 'elev_low', 'pr_count',
-    'has_kudoed', 'average_watts', 'kilojoules', 'map'
+    'id','name', 'distance', 'moving_time', 'elapsed_time','moving_time_hms', 'elapsed_time_hms',
+        'total_elevation_gain',
+        'sport_type', 'start_date', 'start_date_local', 'timezone',
+        'achievement_count', 'kudos_count', 'gear_id', 'start_latlng', 'end_latlng',
+        'average_speed', 'speed_minutes_per_km','speed_minutes_per_km_hms', 'max_speed', 'average_cadence',
+        'average_temp', 'has_heartrate', 'average_heartrate', 'max_heartrate',
+        'elev_high', 'elev_low', 'pr_count', 'has_kudoed', 'average_watts',
+        'kilojoules', 'map'
 ]
 
 # Ajouter les colonnes manquantes avec None
