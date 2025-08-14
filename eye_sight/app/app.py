@@ -6,8 +6,15 @@ from sqlalchemy import create_engine, text
 from eye_sight.params import *
 import altair as alt
 from eye_sight.plots.plot_calendar_heat import plot_calendar
+from eye_sight.plots.basic_plots import *
 
 
+
+st.set_page_config(
+    page_title="Eye Sight",
+    page_icon=":bar_chart:",
+    layout="wide"
+)
 
 
 @st.cache_data
@@ -43,6 +50,7 @@ sport = st.sidebar.multiselect(
     "Sélectionne ton sport:",
     options=df["sport_type"].unique()
 )
+weeks = st.sidebar.slider("Nombre de semaines à afficher sur les graphiques", 4, 52, 10)
 
 df_selection = df.query(
     "sport_type == @sport"
@@ -50,9 +58,11 @@ df_selection = df.query(
 
 
 
+
+
 # --- MAIN PAGE ---
 st.title("Journal d'entrainement")
-st.markdown("##")
+st.markdown("""---""")
 
 left_column, middle_column, right_column = st.columns(3)
 with left_column:
@@ -90,6 +100,11 @@ st.markdown("""---""")
 
 st.dataframe(df_recent)
 
+
+##. Heatmap calendar 2025
+
+st.subheader("Heatmap de 2025")
+
 fig = plot_calendar(df, year_min=2025, max_dist=20)
 
 st.pyplot(fig)
@@ -101,3 +116,10 @@ if df_selection.empty:
     st.stop() # This will halt the app from further execution.
 
 st.dataframe(df_selection)
+
+
+
+
+st.pyplot(plot_hours_per_week(df, weeks))
+st.pyplot(plot_run_trail_km_per_week(df, weeks))
+st.pyplot(plot_bike_km_per_week(df, weeks))
