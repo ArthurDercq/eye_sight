@@ -13,11 +13,8 @@ def create_latest_activity_map(df):
         folium.Map ou None
     """
 
-    # Filtrer uniquement les activités TrailRun
-    df_trailrun = df[df['sport_type'] == 'TrailRun']
-
     # Trier le DataFrame par date décroissante (la plus récente en premier)
-    df_sorted = df_trailrun.sort_values('start_date', ascending=False)
+    df_sorted = df.sort_values('start_date', ascending=False)
 
     # Prendre la première ligne (dernière activité)
     latest_activity = df_sorted.iloc[0]

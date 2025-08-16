@@ -7,6 +7,10 @@ from eye_sight.params import *
 import altair as alt
 from eye_sight.plots.plot_calendar_heat import plot_calendar
 from eye_sight.plots.basic_plots import *
+from eye_sight.plots.plot_map import *
+from streamlit_folium import st_folium
+
+
 
 
 
@@ -62,6 +66,10 @@ df_selection = df.query(
 
 # --- MAIN PAGE ---
 st.title("Journal d'entrainement")
+col1, col2 = st.columns(2)
+with col1:
+    run_week_progress(df, objectif_km=50)
+
 st.markdown("""---""")
 
 left_column, middle_column, right_column = st.columns(3)
@@ -73,6 +81,15 @@ with left_column:
     st.write(f"**Temps en mouvement :** {dernier['moving_time_hms']} s")
     st.write(f"**Vitesse moyenne :** {dernier['average_speed']:.2f} km/h")
     st.write(f"**Dénivelé positif :** {dernier['total_elevation_gain']:.0f} m")
+
+    # Générer la carte
+    m = create_latest_activity_map(df)
+
+    if m is not None:
+     # Afficher la carte dans Streamlit
+        st_folium(m, width=700, height=500)
+    else:
+        st.warning("Pas de trace disponible pour la dernière activité.")
 
 with middle_column:
     st.subheader("Kms en 2025 ")
@@ -110,16 +127,21 @@ fig = plot_calendar(df, year_min=2025, max_dist=20)
 st.pyplot(fig)
 
 
+
+## Plots
+
+st.pyplot(plot_hours_per_week(df, weeks))
+
+st.pyplot(plot_run_trail_km_per_week(df, weeks))
+
+st.pyplot(plot_bike_km_per_week(df, weeks))
+
+#st.pyplot(plot_swim_km_per_week(df, weeks))
+
+
+
 # Check if the dataframe is empty:
 if df_selection.empty:
     st.warning("No data available based on the current filter settings!")
-    st.stop() # This will halt the app from further execution.
 
 st.dataframe(df_selection)
-
-
-
-
-st.pyplot(plot_hours_per_week(df, weeks))
-st.pyplot(plot_run_trail_km_per_week(df, weeks))
-st.pyplot(plot_bike_km_per_week(df, weeks))
