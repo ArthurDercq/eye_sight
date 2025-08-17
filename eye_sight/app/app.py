@@ -139,6 +139,14 @@ st.pyplot(plot_bike_km_per_week(df, weeks))
 #st.pyplot(plot_swim_km_per_week(df, weeks))
 
 
+# Slider pour choisir le nombre d'activités
+num_activities = st.slider("Nombre d'activités les plus récentes à afficher", min_value=5, max_value=50, value=20)
+
+df_recent = df.sort_values("start_date", ascending=False).head(num_activities)
+df_recent = df_recent.sort_values("start_date")  # trier chronologiquement pour la courbe
+st.pyplot(plot_heartrate(df_recent))
+
+
 
 # Check if the dataframe is empty:
 if df_selection.empty:

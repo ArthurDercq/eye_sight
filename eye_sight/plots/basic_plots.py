@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.dates as mdates
+from datetime import datetime
+import streamlit as st
 
 
 
@@ -115,6 +117,36 @@ def plot_hours_bar(weekly_df, value_label="Heures de sport", color="skyblue"):
     return fig
 
 
+def plot_heartrate(df, value_label="Fréquence cardiaque en bpm", color="skyblue"):
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+
+    # X = positions (0, 1, 2...)
+    x_pos = range(len(df))
+
+    # Courbe
+    ax.plot(x_pos, df["average_heartrate"], marker='o', color=color)
+
+    # Axe Y
+    ax.set_ylabel(value_label, fontsize=10)
+    ax.tick_params(axis="y", labelsize=8)
+
+    # Axe X : afficher les dates
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels(
+        df["start_date"].dt.strftime("%d %b"),
+        rotation=45, ha="right", fontsize=8
+    )
+
+    # Cadre : enlever top et right
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    fig.tight_layout()
+    return fig
+
+
+
 
 def plot_hours_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "moving_time", weeks, sport_types=["Run", "TrailRun", 'Bike', 'Swim'])
@@ -135,10 +167,6 @@ def plot_swim_km_per_week(df, weeks=10):
     return _plot_bar_with_dplus(weekly_df, "Natation (kms)", color="orange")
 
 
-
-import streamlit as st
-import pandas as pd
-from datetime import datetime
 
 def run_week_progress(df, objectif_km=50):
     """
@@ -165,6 +193,7 @@ def run_week_progress(df, objectif_km=50):
     # Calcul de la progression
     progression = min(km_total / objectif_km, 1.0)  # max 100%
 
+    return progression, km_total, start_week.strftime('%d/%m/%Y'), end_week.strftime('%d/%m/%Y'), objectif_km
     # Affichage
     st.subheader(f"Semaine du {start_week.strftime('%d/%m/%Y')} au {end_week.strftime('%d/%m/%Y')}")
     st.progress(progression)  # barre de progression
