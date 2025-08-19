@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import matplotlib.dates as mdates
 from datetime import datetime
-import streamlit as st
+import matplotlib.ticker as mticker
+
 
 
 
@@ -116,7 +116,6 @@ def plot_hours_bar(weekly_df, value_label="Heures de sport", color="skyblue"):
     fig.tight_layout()
     return fig
 
-
 def plot_heartrate(df, value_label="Fréquence cardiaque en bpm", color="skyblue"):
 
     fig, ax = plt.subplots(figsize=(10, 4))
@@ -145,18 +144,13 @@ def plot_heartrate(df, value_label="Fréquence cardiaque en bpm", color="skyblue
     fig.tight_layout()
     return fig
 
-
-
-
 def plot_hours_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "moving_time", weeks, sport_types=["Run", "TrailRun", 'Bike', 'Swim'])
     return plot_hours_bar(weekly_df, "Heures de sport", color="green")
 
-
 def plot_run_trail_km_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Run", "TrailRun"])
     return _plot_bar_with_dplus(weekly_df, "Run & Trail (kms) ", color="seagreen")
-
 
 def plot_bike_km_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Bike"])
@@ -165,8 +159,6 @@ def plot_bike_km_per_week(df, weeks=10):
 def plot_swim_km_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Swim"])
     return _plot_bar_with_dplus(weekly_df, "Natation (kms)", color="orange")
-
-
 
 def run_week_progress(df, objectif_km=50):
     """
@@ -194,7 +186,63 @@ def run_week_progress(df, objectif_km=50):
     progression = min(km_total / objectif_km, 1.0)  # max 100%
 
     return progression, km_total, start_week.strftime('%d/%m/%Y'), end_week.strftime('%d/%m/%Y'), objectif_km
-    # Affichage
-    st.subheader(f"Semaine du {start_week.strftime('%d/%m/%Y')} au {end_week.strftime('%d/%m/%Y')}")
-    st.progress(progression)  # barre de progression
-    st.write(f"{km_total:.1f} km parcourus / {objectif_km} km objectif")
+
+
+# 🎨 Palette couleurs graphique
+SPORT_COLORS = {
+    "Run": "#ff7f0e",       # orange
+    "TrailRun": "#ff7f0e",  # même que Run
+    "Ride": "#1f77b4",      # bleu
+    "Swim": "#2ca02c",      # vert
+    "Workout" : "#5C92D1"   # bleu clair
+}
+
+def plot_weekly_intensity(df, week_start, week_end):
+
+    df["start_date"] = pd.to_datetime(df["start_date"]).dt.tz_localize(None)
+    df_week = df[(df["start_date"] >= week_start) & (df["start_date"] < week_end + pd.Timedelta(days=1))].copy()
+
+    if df_week.empty:
+        # --- Figure vide avec message central ---
+        fig, ax = plt.subplots(figsize=(7, 3))
+        ax.text(0.5, 0.5, "Aucune activité cette semaine",
+                ha="center", va="center", fontsize=12, color="gray")
+        ax.axis("off")
+        return fig
+
+    df_week["day"] = df_week["start_date"].dt.day_name(locale="fr_FR").str.lower()  # "lundi", "mardi", etc.
+    # Ordre fixe des jours (toujours lundi→dimanche)
+    days_order = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"]
+
+
+    # Agrégation par jour + sport
+    df_grouped = (
+        df_week.groupby(["day","sport_type"])["elapsed_time"]
+        .sum()
+        .reset_index()
+    )
+    # Pivot pour barres empilées
+    df_pivot = df_grouped.pivot(index="day", columns="sport_type", values="elapsed_time").fillna(0)
+    df_pivot = df_pivot.reindex(days_order)
+
+    # --- Graphique ---
+    fig, ax = plt.subplots(figsize=(7,3))
+
+    df_pivot.plot(
+        kind="bar",
+        stacked=True,
+        ax=ax,
+        color=[SPORT_COLORS.get(s, "gray") for s in df_pivot.columns]
+    )
+
+    # Style épuré
+    ax.set_ylabel("Minutes")
+    ax.set_xlabel("")
+    ax.set_xticklabels([d.capitalize() for d in days_order])
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.legend(frameon=False, bbox_to_anchor=(1,1))
+    ax.yaxis.set_major_locator(mticker.MultipleLocator(50))
+
+
+    return fig

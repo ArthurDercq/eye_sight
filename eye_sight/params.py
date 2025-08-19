@@ -14,7 +14,7 @@ STRAVA_REFRESH_TOKEN = os.getenv('STRAVA_REFRESH_TOKEN')
 
 
 ### DATABSE ###
-DB_PATH = os.getenv("./data/strava_activities.csv")
+DB_PATH = os.getenv("DB_PATH")
 
 
 ## Postegresql ##

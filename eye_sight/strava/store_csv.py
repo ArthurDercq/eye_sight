@@ -1,6 +1,7 @@
 from eye_sight.strava.clean_data import *
 from sqlalchemy import create_engine, text
 from eye_sight.params import *
+from eye_sight.strava.fetch_strava import *
 import pandas as pd
 from datetime import datetime
 
@@ -27,6 +28,7 @@ if __name__ == '__main__':
     date = datetime.now().date()
 
     df = load_data()
+    #df = fetch_strava_data()
     clean_df = clean_data(df)
 
     store_df_in_csv(clean_df, f"/Users/arthurdercq/code/Data Science/Garmin_Dashboard/data/clean_data_{date}.csv")

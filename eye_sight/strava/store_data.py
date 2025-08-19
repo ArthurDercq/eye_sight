@@ -30,8 +30,8 @@ def store_df_in_sqlite(df, db_path, table_name=TABLE_NAME):
 
 def normalize_sport_type(sport):
     mapping = {
-        "Ride": "Bike",
-        "TrainRun": "Trail"
+        "TrailRun": "Trail",
+        "Ride": "Bike"
     }
     return mapping.get(sport, sport)
 
