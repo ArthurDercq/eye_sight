@@ -145,11 +145,11 @@ def plot_heartrate(df, value_label="Fréquence cardiaque en bpm", color="skyblue
     return fig
 
 def plot_hours_per_week(df, weeks=10):
-    weekly_df = _prepare_weekly_data(df, "moving_time", weeks, sport_types=["Run", "TrailRun", 'Bike', 'Swim'])
+    weekly_df = _prepare_weekly_data(df, "moving_time", weeks, sport_types=["Run", "Trail", 'Bike', 'Swim'])
     return plot_hours_bar(weekly_df, "Heures de sport", color="green")
 
 def plot_run_trail_km_per_week(df, weeks=10):
-    weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Run", "TrailRun"])
+    weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Run", "Trail"])
     return _plot_bar_with_dplus(weekly_df, "Run & Trail (kms) ", color="seagreen")
 
 def plot_bike_km_per_week(df, weeks=10):
@@ -162,14 +162,14 @@ def plot_swim_km_per_week(df, weeks=10):
 
 def run_week_progress(df, objectif_km=50):
     """
-    Affiche une barre de progression pour le Run/TrailRun de la semaine en cours.
+    Affiche une barre de progression pour le Run/Trail de la semaine en cours.
 
     Args:
         df (pd.DataFrame): DataFrame avec colonnes 'start_date', 'sport_type', 'distance_km'
         objectif_km (float): objectif en km
     """
-    # Filtrer pour Run et TrailRun
-    df_run = df[df['sport_type'].isin(['Run', 'TrailRun'])].copy()
+    # Filtrer pour Run et Trail
+    df_run = df[df['sport_type'].isin(['Run', 'Trail'])].copy()
 
     # Date du début de la semaine (lundi)
     today = pd.Timestamp(datetime.today())
@@ -191,7 +191,7 @@ def run_week_progress(df, objectif_km=50):
 # 🎨 Palette couleurs graphique
 SPORT_COLORS = {
     "Run": "#ff7f0e",       # orange
-    "TrailRun": "#ff7f0e",  # même que Run
+    "Trail": "#f5b075",  # même que Run
     "Ride": "#1f77b4",      # bleu
     "Swim": "#2ca02c",      # vert
     "Workout" : "#5C92D1"   # bleu clair

@@ -113,14 +113,14 @@ else:
 # =========================
 # SIDEBAR
 # =========================
-st.sidebar.header("🎯 Filtres")
-sport = st.sidebar.multiselect(
-    "Sélectionne ton sport:",
-    options=df["sport_type"].unique()
-)
-weeks = st.sidebar.slider("Nombre de semaines à afficher", 4, 52, 10)
+#st.sidebar.header("🎯 Filtres")
+#sport = st.sidebar.multiselect(
+#    "Sélectionne ton sport:",
+#    options=df["sport_type"].unique()
+#)
+#weeks = st.sidebar.slider("Nombre de semaines à afficher", 4, 52, 10)
 
-df_selection = df.query("sport_type == @sport") if sport else df
+#df_selection = df.query("sport_type == @sport") if sport else df
 
 
 # =========================
@@ -178,14 +178,14 @@ st.markdown('<div class="section-space">', unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    km_run_2025 = df[df["start_date"].dt.year == 2025].query("sport_type in ['Run','TrailRun']")["distance"].sum()
+    km_run_2025 = df[df["start_date"].dt.year == 2025].query("sport_type in ['Run','Trail']")["distance"].sum()
     st.markdown(f"<div class='bento-box kpi-box'>🏃 {km_run_2025:.1f} km en 2025</div>".replace(",", " "), unsafe_allow_html=True)
 
 with col2:
     km_bike_2025 = df[df["start_date"].dt.year == 2025].query("sport_type in ['Bike']")["distance"].sum()
     st.markdown(f"<div class='bento-box kpi-box'>🚴🏼 {km_bike_2025:.1f} km en 2025</div>", unsafe_allow_html=True)
 with col3:
-    d_plus = df[df["start_date"].dt.year == 2025].query("sport_type in ['TrailRun','Run', 'Bike']")["total_elevation_gain"].sum()
+    d_plus = df[df["start_date"].dt.year == 2025].query("sport_type in ['Trail','Run', 'Bike']")["total_elevation_gain"].sum()
     st.markdown(f"<div class='bento-box kpi-box'>⛰️ {d_plus:.0f} m D+ en 2025</div>", unsafe_allow_html=True)
 
 
@@ -203,14 +203,13 @@ st.markdown('</div>', unsafe_allow_html=True)
 # Initialisation si pas encore définie
 if "selected_sport" not in st.session_state:
     st.session_state.selected_sport = "Run"  # valeur par défaut
-
 # 4 boutons côte à côte
 col1, col2, col3, col4, _ = st.columns([1,1,1,1,5])  # les 4 premiers = boutons, le dernier = espace vide
 
 
 with col1:
     if st.button("🏔️ Trail", key="btn_trail"):
-        st.session_state.selected_sport = "TrailRun"
+        st.session_state.selected_sport = "Trail"
 with col2:
     if st.button("🏃 Course", key="btn_course"):
         st.session_state.selected_sport = "Run"
@@ -253,6 +252,9 @@ else:
 
 # --- Graphiques 2 par 2 ---
 st.markdown("<div class='title'>Graphiques</div>", unsafe_allow_html=True)
+
+weeks = 10 ## Nombre de semaines à afficher par défaut
+
 charts = [
     ("📅 Heatmap 2025", plot_calendar(df, year_min=2025, max_dist=20)),
     ("🕒 Heures par semaine", plot_hours_per_week(df, weeks)),
@@ -278,11 +280,3 @@ st.markdown("<div class='title'>Fréquence cardiaque - dernières activités</di
 num_activities = st.slider("Nombre d'activités", 5, 50, 20)
 df_recent = df.sort_values("start_date", ascending=False).head(num_activities).sort_values("start_date")
 st.pyplot(plot_heartrate(df_recent))
-
-
-# --- Dataframe ---
-st.markdown("<div class='title'>Tableau filtré</div>", unsafe_allow_html=True)
-if df_selection.empty:
-    st.warning("Aucune donnée selon les filtres actuels.")
-else:
-    st.dataframe(df_selection)
