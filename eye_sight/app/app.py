@@ -28,14 +28,14 @@ THEME = {
     "font": "Poppins, sans-serif",
     "title_color": "#1E3A8A",   # bleu foncé
     "subtitle_color" : "#3F589B",
-    "box_title_color" : "#818C9B",
+    "box_title_color" : "#E5E7EB",
     "kpi_bg": "#E0F2FE",        # bleu clair
     "progress": "#000000",
     "box_radius": "10px",
     "shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
 }
 
-# Inject custom CSS
+# Custom CSS
 st.markdown(f"""
     <style>
     * {{
@@ -49,7 +49,32 @@ st.markdown(f"""
 
     /* Si besoin, ajuster aussi le padding du contenu principal */
     .block-container {{
-        padding-top: 1.5rem;  /* met un petit padding minime */
+        padding-top: 3.5rem;  /* met un petit padding minime */
+    }}
+
+    /* Titre principal */
+    .main-title {{
+        font-size: 2.8rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #E5E7EB;
+    }}
+    /* Bouton personnalisé */
+    div.stButton > button:first-child {{
+        background-color: rgba(31, 41, 52, 0.4);
+        color: #E5E7EB;
+        border: 1px solid #1F2934;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 500;
+        cursor: pointer;
+    }}
+    div.stButton > button:first-child:hover {{
+        background-color: rgba(31, 41, 52, 0.7);
+        color: #ffffff;
+    }}
+    .stProgress > div > div > div > div {{
+        background-color: #6466EA !important;
     }}
     .bento-box {{
         background-color: #1F2934;
@@ -70,13 +95,13 @@ st.markdown(f"""
         font-size: 1.4rem;
         margin: 0.5rem 0;
     }}
-    .box_title {{
+    .box-title {{
         color: {THEME["box_title_color"]};
         font-weight: bold;
         font-size: 1.4rem;
         margin: 0.5rem 0;
     }}
-    .box_element {{
+    .box-element {{
         color: {THEME["box_title_color"]};
         font-weight: normal;
         font-size: 1rem;
@@ -113,11 +138,10 @@ def load_data():
 # HEADER & REFRESH DATA
 # =========================
 
-
-st.title("📊 Journal d'entrainement")
+st.markdown("<div class='main-title'>Mon journal d’entraînement</div>", unsafe_allow_html=True)
 
 # --- Refresh bouton ---
-if st.button("🔄 Rafraîchir mes données"):
+if st.button("Rafraîchir mes données"):
     message = update_database()
     st.success(message, icon="🔥")
     load_data.clear()
@@ -142,15 +166,6 @@ else:
 # MAIN PAGE
 # =========================
 
-# --- Suivi hebod ---
-st.markdown('<div class="section-space">', unsafe_allow_html=True)
-
-st.markdown("<div class='title'>Suivi hebdomadaire</div>", unsafe_allow_html=True)
-
-st.markdown('<div class="section-space">', unsafe_allow_html=True)
-
-
-st.markdown('<div class="section-space">', unsafe_allow_html=True)
 
 # --- Définition semaine ---
 if "week_offset" not in st.session_state:
@@ -161,31 +176,60 @@ week_start = today - pd.to_timedelta(today.weekday(), unit="D") + pd.Timedelta(w
 week_end = week_start + pd.Timedelta(days=6)
 
 
-col1, col2, col3,_ ,__ = st.columns([1,2,1,1,2])
-with col1:
-    if st.button("<"):
-        st.session_state.week_offset -= 1
-with col2:
-    st.markdown(f"<div class='subtitle'> Semaine du {week_start.strftime('%d/%m')} au {week_end.strftime('%d/%m')}</div>", unsafe_allow_html=True)
-
-with col3:
-    if st.button(">"):
-        st.session_state.week_offset += 1
-st.markdown('</div>', unsafe_allow_html=True)
+# --- 2 box intro ---
 
 st.markdown('<div class="section-space">', unsafe_allow_html=True)
 
-c1, c2 = st.columns(2)
-with c1:
-    progression, km_total, start_week, end_week, objectif_km =  run_week_progress(df, objectif_km=50)
+col1, col2 = st.columns([2,1.5])
+with col1:
+    dernier = df.sort_values(by="start_date", ascending=False).iloc[0]
+    st.markdown(f"""
+        <div class='bento-box'>
+            <div class='box-title'>Dernière activité
+            <div class='box-element'> Type:</b> {dernier['sport_type']}</p>
+            <p><b>Distance:</b> {dernier['distance']:.2f} km</p>
+            <p><b>Durée:</b> {dernier['moving_time_hms']}</p>
+            <p><b>Allure moy.:</b> {dernier['speed_minutes_per_km_hms']} min/km ({dernier['average_speed']:.2f} km/h)</p>
+            <p><b>D+:</b> {dernier['total_elevation_gain']:.0f} m</p>
+            <p><b>BPM moyen:</b> {dernier['average_heartrate']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+with col2:
+
+    progression, km_total, start_week, end_week, objectif_km = run_week_progress(df, objectif_km=50)
+
+    # Ouvre la box
+    st.markdown(f"""
+    <div class='bento-box'>
+        <span style='font-size:1.5rem; font-weight:600;'>Objectifs</span>
+        <span style='font-size:0.6rem; font-weight:200; color:#D1D5DB; margin-left:8px;'>
+            Semaine du {week_start.strftime('%d/%m')} au {week_end.strftime('%d/%m')}
+        </span>
+        <div style='margin-top:10px;'>
+    """, unsafe_allow_html=True)
+
+    # Composants Streamlit "dans" la box
     st.progress(progression)
-    st.markdown(f"<div class='subtitle progress'> {km_total:.1f} kms parcourus / {objectif_km} kms </div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='subtitle progress'>{km_total:.1f} kms parcourus / {objectif_km} kms</div>", unsafe_allow_html=True)
 
-with c2:
-    st.markdown("<div class='title'>Minutes d'intensité</div>", unsafe_allow_html=True)
-    st.pyplot(plot_weekly_intensity(df,week_start, week_end))
+    # Ferme la box
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
+
+
+
+st.markdown("<div class='title'>Minutes d'intensité</div>", unsafe_allow_html=True)
+st.pyplot(plot_weekly_intensity(df,week_start, week_end))
 st.markdown('</div>', unsafe_allow_html=True)
+
+
+
 
 # --- KPIs ---
 st.markdown('<div class="section-space">', unsafe_allow_html=True)
@@ -221,16 +265,16 @@ col1, col2, col3, col4, _ = st.columns([1,1,1,1,5])  # les 4 premiers = boutons,
 
 
 with col1:
-    if st.button("🏔️ Trail", key="btn_trail"):
+    if st.button("Trail", key="btn_trail"):
         st.session_state.selected_sport = "Trail"
 with col2:
-    if st.button("🏃 Course", key="btn_course"):
+    if st.button("Course", key="btn_course"):
         st.session_state.selected_sport = "Run"
 with col3:
-    if st.button("🚴 Vélo", key="btn_velo"):
+    if st.button("Vélo", key="btn_velo"):
         st.session_state.selected_sport = "Bike"
 with col4:
-    if st.button("🏊 Natation", key="btn_swim"):
+    if st.button("Natation", key="btn_swim"):
         st.session_state.selected_sport = "Swim"
 
 
