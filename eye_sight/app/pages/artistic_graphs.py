@@ -78,6 +78,7 @@ df_formatted["average_watts"] = df_formatted["average_watts"].astype(str) + " W"
 #Renommer les colonnes proprement
 df_formatted = df_formatted.rename(columns={
     "sport_type": "Sport",
+    "distance": "Distance",
     "date": "Date",
     "name": "Activité",
     "moving_time_hms": "Durée",

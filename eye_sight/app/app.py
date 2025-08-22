@@ -3,12 +3,13 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from streamlit_folium import st_folium
 
+
 # Imports locaux
 from eye_sight.update_database import update_database
 from eye_sight.params import DB_URI, TABLE_NAME
 from eye_sight.plots.plot_calendar_heat import plot_calendar
 from eye_sight.plots.basic_plots import *
-from eye_sight.plots.plot_map import create_latest_activity_map
+from eye_sight.plots.plot_map import *
 
 
 # =========================
@@ -27,9 +28,10 @@ THEME = {
     "font": "Poppins, sans-serif",
     "title_color": "#1E3A8A",   # bleu foncé
     "subtitle_color" : "#3F589B",
+    "box_title_color" : "#818C9B",
     "kpi_bg": "#E0F2FE",        # bleu clair
     "progress": "#000000",
-    "box_radius": "20px",
+    "box_radius": "10px",
     "shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
 }
 
@@ -50,6 +52,7 @@ st.markdown(f"""
         padding-top: 1.5rem;  /* met un petit padding minime */
     }}
     .bento-box {{
+        background-color: #1F2934;
         border-radius: {THEME["box_radius"]};
         box-shadow: {THEME["shadow"]};
         padding: 1rem;
@@ -65,6 +68,18 @@ st.markdown(f"""
         color: {THEME["title_color"]};
         font-weight: bold;
         font-size: 1.4rem;
+        margin: 0.5rem 0;
+    }}
+    .box_title {{
+        color: {THEME["box_title_color"]};
+        font-weight: bold;
+        font-size: 1.4rem;
+        margin: 0.5rem 0;
+    }}
+    .box_element {{
+        color: {THEME["box_title_color"]};
+        font-weight: normal;
+        font-size: 1rem;
         margin: 0.5rem 0;
     }}
     .subtitle {{
@@ -194,8 +209,6 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Dernière activité ---
 st.markdown('<div class="section-space">', unsafe_allow_html=True)
-
-st.markdown("<div class='title'>Dernière activité</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle progress'>Choisis le sport à afficher</div>", unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
@@ -230,7 +243,8 @@ if not df_filtered.empty:
     with colA:
         st.markdown(f"""
         <div class='bento-box'>
-            <p><b>Type:</b> {dernier['sport_type']}</p>
+            <div class='box_title'>Dernière activité
+            <div class='box_element'> Type:</b> {dernier['sport_type']}</p>
             <p><b>Distance:</b> {dernier['distance']:.2f} km</p>
             <p><b>Durée:</b> {dernier['moving_time_hms']}</p>
             <p><b>Allure moy.:</b> {dernier['speed_minutes_per_km_hms']} min/km ({dernier['average_speed']:.2f} km/h)</p>
@@ -245,6 +259,9 @@ if not df_filtered.empty:
             st_folium(m, width=700, height=500)
         else:
             st.warning("Pas de trace disponible pour ce sport.")
+
+
+        st.pyplot(plot_mini_map(df_filtered))
 else:
     st.warning("Aucune activité trouvée pour ce sport 🚫")
 

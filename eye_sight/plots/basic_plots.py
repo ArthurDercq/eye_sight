@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import matplotlib.ticker as mticker
 
-
+plt.style.use("/Users/arthurdercq/code/Data Science/Garmin_Dashboard/eye_sight/plots/my_style.mplstyle")
 
 
 
@@ -80,7 +80,7 @@ def _plot_bar_with_dplus(weekly_df, value_label, color="skyblue"):
     fig.tight_layout()
     return fig
 
-def plot_hours_bar(weekly_df, value_label="Heures de sport", color="skyblue"):
+def plot_hours_bar(weekly_df, value_label="Heures de sport", color="#B4B3E5"):
     fig, ax = plt.subplots(figsize=(10, 4))
 
     # Extraire les valeurs en minutes
@@ -96,18 +96,18 @@ def plot_hours_bar(weekly_df, value_label="Heures de sport", color="skyblue"):
 
     # Valeurs au-dessus des barres en HH:MM:SS
     labels = [_minutes_to_hms(m) for m in values_in_minutes]
-    ax.bar_label(bars, labels=labels, padding=3, fontsize=8, color="black")
+    ax.bar_label(bars, labels=labels, padding=3) #, fontsize=8, color="black"
 
     # Axe Y (en heures)
-    ax.set_ylabel(value_label, fontsize=10)
-    ax.tick_params(axis="y", labelsize=8)
+    ax.set_ylabel(value_label) #, fontsize=10
+    ax.tick_params(axis="y") #, labelsize=8
 
     # Axe X → semaine
     ax.set_xticks(weekly_df["week"])
     ax.set_xticklabels(
         weekly_df["week"].dt.strftime("%d %b %Y"),
-        rotation=45, ha="right", fontsize=8
-    )
+        rotation=45, ha="right"
+    ) #, fontsize=8
 
     # Cadre : enlever top et right
     ax.spines["top"].set_visible(False)
@@ -127,15 +127,15 @@ def plot_heartrate(df, value_label="Fréquence cardiaque en bpm", color="skyblue
     ax.plot(x_pos, df["average_heartrate"], marker='o', color=color)
 
     # Axe Y
-    ax.set_ylabel(value_label, fontsize=10)
-    ax.tick_params(axis="y", labelsize=8)
+    ax.set_ylabel(value_label) #, fontsize=10
+    ax.tick_params(axis="y") #, labelsize=8
 
     # Axe X : afficher les dates
     ax.set_xticks(x_pos)
     ax.set_xticklabels(
         df["start_date"].dt.strftime("%d %b"),
-        rotation=45, ha="right", fontsize=8
-    )
+        rotation=45, ha="right"
+    ) #, fontsize=8
 
     # Cadre : enlever top et right
     ax.spines["top"].set_visible(False)
@@ -146,19 +146,19 @@ def plot_heartrate(df, value_label="Fréquence cardiaque en bpm", color="skyblue
 
 def plot_hours_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "moving_time", weeks, sport_types=["Run", "Trail", 'Bike', 'Swim'])
-    return plot_hours_bar(weekly_df, "Heures de sport", color="green")
+    return plot_hours_bar(weekly_df, "Heures de sport", color="#B4B3E5")
 
 def plot_run_trail_km_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Run", "Trail"])
-    return _plot_bar_with_dplus(weekly_df, "Run & Trail (kms) ", color="seagreen")
+    return _plot_bar_with_dplus(weekly_df, "Run & Trail (kms) ", color="#373AF1")
 
 def plot_bike_km_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Bike"])
-    return _plot_bar_with_dplus(weekly_df, "Vélo (kms)", color="orange")
+    return _plot_bar_with_dplus(weekly_df, "Vélo (kms)", color="#8A5CFC")
 
 def plot_swim_km_per_week(df, weeks=10):
     weekly_df = _prepare_weekly_data(df, "distance", weeks, sport_types=["Swim"])
-    return _plot_bar_with_dplus(weekly_df, "Natation (kms)", color="orange")
+    return _plot_bar_with_dplus(weekly_df, "Natation (kms)", color="#D942F7")
 
 def run_week_progress(df, objectif_km=50):
     """
@@ -190,11 +190,11 @@ def run_week_progress(df, objectif_km=50):
 
 # 🎨 Palette couleurs graphique
 SPORT_COLORS = {
-    "Run": "#ff7f0e",       # orange
-    "Trail": "#f5b075",  # même que Run
-    "Ride": "#1f77b4",      # bleu
-    "Swim": "#2ca02c",      # vert
-    "Workout" : "#5C92D1"   # bleu clair
+    "Run": "#6466EA",       # orange
+    "Trail": "#373AF1",  # même que Run
+    "Bike": "#8B5CFC",      # bleu
+    "Swim": "#D942F7",      # vert
+    "Workout" : "#633C8F"   # bleu clair
 }
 
 def plot_weekly_intensity(df, week_start, week_end):
@@ -236,9 +236,9 @@ def plot_weekly_intensity(df, week_start, week_end):
     )
 
     # Style épuré
-    ax.set_ylabel("Minutes")
-    ax.set_xlabel("")
-    ax.set_xticklabels([d.capitalize() for d in days_order])
+    ax.set_ylabel("Minutes").set_color('#5C6A7D')
+    ax.set_xlabel("").set_color("#5C6A7D")
+    ax.set_xticklabels([d.capitalize() for d in days_order], rotation=45, ha="right")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.legend(frameon=False, bbox_to_anchor=(1,1))

@@ -1,0 +1,30 @@
+# ==============================
+# Style global personnalisé
+# Couleur principale : #5C6A7D
+# ==============================
+
+# Couleur et largeur des lignes
+lines.color : #5C6A7D
+lines.linewidth : 2
+
+# Taille et couleur des axes
+axes.labelsize : 14
+axes.labelcolor : #5C6A7D
+axes.titlesize : 16
+axes.titlecolor : #5C6A7D
+
+# Couleur et taille des ticks
+xtick.color : #5C6A7D
+ytick.color : #5C6A7D
+xtick.labelsize : 12
+ytick.labelsize : 12
+
+# Style du cadre (spines) et grid
+axes.edgecolor : #5C6A7D
+axes.linewidth : 1
+grid.color : #5C6A7D
+grid.linestyle : --
+grid.linewidth : 0.5
+
+# Fond de figure
+figure.facecolor : none
