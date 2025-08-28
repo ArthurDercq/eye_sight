@@ -24,21 +24,21 @@ def update_strava():
     if new_data.empty:
         return None
 
-    cleaned_data = clean_data(new_data)
-
-    return cleaned_data
+    return new_data
 
 
 def update_database():
 
-    cleaned_data = update_strava()
+    new_data = update_strava()
 
-    if cleaned_data is None:
-        return "Aucune nouvelle activité trouvée."
+    if new_data is None:
+        return print("Aucune nouvelle activité trouvée")
+
+    cleaned_data = clean_data(new_data)
 
     store_df_in_postgresql(cleaned_data, host=HOST, database=DATABASE, user=USER, password=PASSWORD, port=PORT)
 
-    return f"{len(cleaned_data)} nouvelle(s) activité(s) ajoutée(s)."
+    return print(f"{len(cleaned_data)} nouvelle(s) activité(s) ajoutée(s)")
 
 
 
@@ -46,8 +46,4 @@ def update_database():
 
 if __name__ == "__main__":
 
-    raw_df = update_strava()
-
-    cleaned_data = clean_data(raw_df)
-
-    store_df_in_postgresql(cleaned_data, host=HOST, database=DATABASE, user=USER, password=PASSWORD, port=PORT)
+    update_database()

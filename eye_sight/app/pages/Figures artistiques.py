@@ -43,13 +43,13 @@ st.markdown(f"""
 
 # Colonnes à afficher
 cols = [
-    "date","name", "sport_type", "distance", "moving_time_hms",
+    "start_date","name", "sport_type", "distance", "moving_time_hms",
     "speed_minutes_per_km_hms", "total_elevation_gain",
      "average_heartrate", "average_watts", "average_speed"
 ]
 
 # Copie filtrée
-df_formatted = df[cols].sort_values(by="date", ascending=False).copy()
+df_formatted = df[cols].sort_values(by="start_date", ascending=False).copy()
 
 ## Gérer les Nan et les arrondis
 df_formatted["distance"] = df_formatted["distance"].apply(
@@ -58,7 +58,7 @@ df_formatted["distance"] = df_formatted["distance"].apply(
 df_formatted["average_heartrate"] = df_formatted["average_heartrate"].apply(
     lambda x: f"{int(round(x))} bpm" if pd.notnull(x) else ""
 )
-df_formatted["date"] = pd.to_datetime(df_formatted["date"]).dt.strftime("%d/%m/%Y")
+df_formatted["start_date"] = pd.to_datetime(df_formatted["start_date"]).dt.strftime("%d/%m/%Y")
 
 # Colonne Vitesse/Allure
 def format_speed(row):
@@ -79,7 +79,7 @@ df_formatted["average_watts"] = df_formatted["average_watts"].astype(str) + " W"
 df_formatted = df_formatted.rename(columns={
     "sport_type": "Sport",
     "distance": "Distance",
-    "date": "Date",
+    "start_date": "Date",
     "name": "Activité",
     "moving_time_hms": "Durée",
     "total_elevation_gain": "D+",

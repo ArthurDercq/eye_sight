@@ -246,3 +246,69 @@ def plot_weekly_intensity(df, week_start, week_end):
 
 
     return fig
+
+
+
+import matplotlib.pyplot as plt
+
+def plot_repartition_run(df_filtered, sport_type):
+    """
+    Retourne une figure matplotlib d'un barplot horizontal du nombre d'activités
+    par catégorie de distance pour un sport donné.
+
+    Parameters:
+        df_filtered (pd.DataFrame): DataFrame filtré sur la semaine et le sport sélectionné
+        sport_type (str): 'Run' ou 'Trail'
+
+    Returns:
+        matplotlib.figure.Figure
+    """
+
+    # Filtrer le sport choisi
+    df_sport = df_filtered[df_filtered["sport_type"] == sport_type].copy()
+
+    if df_sport.empty:
+        return None  # pas de données
+
+    # Définir la catégorie de distance
+    def categorie_distance(d):
+        if d < 10:
+            return "Court (<10 km)"
+        elif 10 <= d <= 20:
+            return "Moyen (10-20 km)"
+        else:
+            return "Long (>20 km)"
+
+    df_sport["categorie_distance"] = df_sport["distance"].apply(categorie_distance)
+
+    # Compter le nombre d'activités par catégorie
+    df_count = df_sport.groupby("categorie_distance").size().reindex(
+        ["Court (<10 km)", "Moyen (10-20 km)", "Long (>20 km)"], fill_value=0
+    )
+
+    # Créer la figure
+    fig, ax = plt.subplots(figsize=(6,4))
+    ax.barh(df_count.index, df_count.values, color='#6466EA',height=0.2)
+
+    # Ajouter les valeurs à côté des barres
+    for i, v in enumerate(df_count.values):
+        ax.text(v + 0.1, i, str(v), va='center')
+
+    ax.set_xlabel("Nombre d'activités")
+    #ax.set_title(f"{sport_type} - Activités par catégorie de distance")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+
+
+    # Axe X de 0 au nombre max d'activités
+    max_activites = df_count.values.max()
+    ax.set_xlim(0, max_activites + 1)
+    ax.set_xticks(range(0, max_activites + 1, 1))
+    plt.tight_layout()
+
+    ax.tick_params(left=False, bottom=False, labelleft=True, labelbottom=False)
+
+
+    return fig

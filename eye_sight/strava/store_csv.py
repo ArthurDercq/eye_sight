@@ -28,7 +28,5 @@ if __name__ == '__main__':
     date = datetime.now().date()
 
     df = load_data()
-    #df = fetch_strava_data()
-    clean_df = clean_data(df)
 
-    store_df_in_csv(clean_df, f"/Users/arthurdercq/code/Data Science/Garmin_Dashboard/data/clean_data_{date}.csv")
+    store_df_in_csv(df, f"/Users/arthurdercq/code/Data Science/Garmin_Dashboard/data/clean_data_{date}.csv")
