@@ -117,6 +117,26 @@ st.markdown(f"""
         color: {THEME["progress"]};
     }}
     .section-space {{ margin-top: 2rem; margin-bottom: 2rem; }}
+
+    /* Section accomplissements */
+    .accomplishments {{
+        color: {THEME["box_title_color"]};
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background-color: #1F2934;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 30px;
+        font-size: 1.2rem;
+    }}
+    .accomplishments div {{
+        text-align: center;
+    }}
+    .accomplishments .number {{
+        font-size: 2rem;
+        font-weight: 600;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -172,8 +192,25 @@ if "week_offset" not in st.session_state:
     st.session_state.week_offset = 0
 
 today = pd.Timestamp.today().normalize()
-week_start = today - pd.to_timedelta(today.weekday(), unit="D") + pd.Timedelta(weeks=st.session_state.week_offset)
-week_end = week_start + pd.Timedelta(days=6)
+
+# Générer une liste des dernières semaines (ex: 10 dernières)
+weeks = []
+for i in range(10):
+    start = today - pd.to_timedelta(today.weekday(), unit="D") - pd.Timedelta(weeks=i)
+    end = start + pd.Timedelta(days=6)
+    weeks.append((start, end))
+#week_start = today - pd.to_timedelta(today.weekday(), unit="D") + pd.Timedelta(weeks=st.session_state.week_offset)
+#week_end = week_start + pd.Timedelta(days=6)
+# Créer des labels lisibles pour l'utilisateur
+week_labels = [f"Semaine du {s.strftime('%d/%m')} au {e.strftime('%d/%m')}" for s, e in weeks]
+
+# Selectbox pour choisir la semaine
+selected_label = st.selectbox("Choisis ta semaine :", week_labels)
+
+# Récupérer les bornes en fonction du choix
+selected_index = week_labels.index(selected_label)
+week_start, week_end = weeks[selected_index]
+
 
 
 # --- 2 box intro ---
@@ -182,6 +219,7 @@ st.markdown('<div class="section-space">', unsafe_allow_html=True)
 
 col1, col2 = st.columns([2,1.5])
 with col1:
+    last_df = df.sort_values(by="start_date", ascending=False).iloc[[0]]
     dernier = df.sort_values(by="start_date", ascending=False).iloc[0]
     st.markdown(f"""
         <div class='bento-box'>
@@ -194,6 +232,8 @@ with col1:
             <p><b>BPM moyen:</b> {dernier['average_heartrate']}</p>
         </div>
         """, unsafe_allow_html=True)
+
+    st.pyplot(plot_mini_map(last_df))
 
 with col2:
 
@@ -247,6 +287,13 @@ with col3:
     d_plus = df[df["start_date"].dt.year == 2025].query("sport_type in ['Trail','Run', 'Bike']")["total_elevation_gain"].sum()
     st.markdown(f"<div class='bento-box kpi-box'>⛰️ {d_plus:.0f} m D+ en 2025</div>", unsafe_allow_html=True)
 
+st.markdown(f"""
+<div class='accomplishments'>
+    <div><span class="number">{km_run_2025:.1f}</span><br/>Kilomètres courus</div>
+    <div><span class="number">{km_bike_2025:.1f}</span><br/>Kilomètres roulés</div>
+    <div><span class="number">{d_plus:.0f}</span><br/>Mètres grimpés</div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -305,7 +352,7 @@ if not df_filtered.empty:
             st.warning("Pas de trace disponible pour ce sport.")
 
 
-        st.pyplot(plot_mini_map(df_filtered))
+
 else:
     st.warning("Aucune activité trouvée pour ce sport 🚫")
 
