@@ -62,13 +62,30 @@ def _plot_bar_with_dplus(weekly_df, value_label, color="skyblue"):
     ax2 = ax1.twinx()
     ax2.plot(weekly_df["week"], weekly_df["total_elevation_gain"], color="lightcoral", linewidth = 2, alpha=0.4)
     ax2.get_yaxis().set_visible(False)  # cache ticks et labels
-    #ax2.set_ylabel("D+ (m)", color="darkred", fontsize=10)
-    #ax2.tick_params(axis="y", labelcolor="darkred", labelsize=8)
+
+    for label in ax2.get_xticklabels() + ax2.get_yticklabels():
+        label.set_color("#5C6A7D")
+        label.set_fontsize(8)
+
+
+    # Couleur des axes (spines)
+    for spine in ax1.spines.values():
+        spine.set_color("#5C6A7D")
+
+    # Couleur + taille des ticks
+    ax1.tick_params(axis="both", colors="#5C6A7D", labelsize=8)
+
+    # Couleur des labels (valeurs sur les ticks)
+    for label in ax1.get_xticklabels() + ax1.get_yticklabels():
+        label.set_color("#5C6A7D")
+        label.set_fontsize(8)
+
 
     # Formatage de l'axe X → une étiquette par semaine
     ax1.set_xticks(weekly_df["week"])
     ax1.set_xticklabels(weekly_df["week"].dt.strftime("%d %b %Y"), rotation=45, ha="right", fontsize=8)
 
+    ax1.set_ylabel(value_label, fontsize=8, color="#5C6A7D")
 
     # Garder X et Y, enlever seulement top et right
     ax1.spines["top"].set_visible(False)
@@ -97,9 +114,23 @@ def plot_hours_bar(weekly_df, value_label="Heures de sport", color="#B4B3E5"):
     # Valeurs au-dessus des barres en HH:MM:SS
     labels = [_minutes_to_hms(m) for m in values_in_minutes]
     ax.bar_label(bars, labels=labels, padding=3) #, fontsize=8, color="black"
+    # Style
 
+    # Couleur des axes (spines)
+    for spine in ax.spines.values():
+        spine.set_color("#5C6A7D")
+
+    # Couleur + taille des ticks
+    ax.tick_params(axis="both", colors="#5C6A7D", labelsize=8)
+
+    # Couleur des labels (valeurs sur les ticks)
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_color("#5C6A7D")
+        label.set_fontsize(8)
+
+    ax.set_xlabel("",fontsize=8, color="#5C6A7D")
     # Axe Y (en heures)
-    ax.set_ylabel(value_label) #, fontsize=10
+    ax.set_ylabel(value_label, fontsize=8, color="#5C6A7D")
     ax.tick_params(axis="y") #, labelsize=8
 
     # Axe X → semaine
@@ -235,21 +266,35 @@ def plot_weekly_intensity(df, week_start, week_end):
         color=[SPORT_COLORS.get(s, "gray") for s in df_pivot.columns]
     )
 
-    # Style épuré
-    ax.set_ylabel("Minutes").set_color('#5C6A7D')
-    ax.set_xlabel("").set_color("#5C6A7D")
-    ax.set_xticklabels([d.capitalize() for d in days_order], rotation=45, ha="right")
+    # Style
+
+    # Couleur des axes (spines)
+    for spine in ax.spines.values():
+        spine.set_color("#5C6A7D")
+
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-    ax.legend(frameon=False, bbox_to_anchor=(1,1))
-    ax.yaxis.set_major_locator(mticker.MultipleLocator(50))
 
+    # Couleur + taille des ticks
+    ax.tick_params(axis="both", colors="#5C6A7D", labelsize=8)
+
+    # Couleur des labels (valeurs sur les ticks)
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_color("#5C6A7D")
+        label.set_fontsize(8)
+
+    ax.set_xticklabels([d.capitalize() for d in days_order], rotation=45, ha="right")
+
+
+    ax.set_ylabel("Minutes", fontsize=8, color="#5C6A7D")
+    ax.set_xlabel("")
+
+    ax.legend(frameon=False, bbox_to_anchor=(1,1))
+    #ax.yaxis.set_major_locator(mticker.MultipleLocator(50))
 
     return fig
 
 
-
-import matplotlib.pyplot as plt
 
 def plot_repartition_run(df_filtered, sport_type):
     """
@@ -294,8 +339,17 @@ def plot_repartition_run(df_filtered, sport_type):
     for i, v in enumerate(df_count.values):
         ax.text(v + 0.1, i, str(v), va='center')
 
-    ax.set_xlabel("Nombre d'activités")
-    #ax.set_title(f"{sport_type} - Activités par catégorie de distance")
+
+
+    # Couleur + taille des ticks
+    ax.tick_params(axis="both", colors="#5C6A7D", labelsize=8)
+    # Couleur des labels (valeurs sur les ticks)
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_color("#5C6A7D")
+        label.set_fontsize(8)
+
+
+    ax.set_xlabel("Nombre d'activités",fontsize=8, color="#5C6A7D")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.spines["left"].set_visible(False)

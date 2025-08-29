@@ -383,7 +383,7 @@ charts = [
     ("🕒 Heures par semaine", plot_hours_per_week(df, weeks=10)),
     ("🏃 Km Run/Trail par semaine", plot_run_trail_km_per_week(df, weeks=10)),
     ("🚴 Km Vélo par semaine", plot_bike_km_per_week(df, weeks=10)),
-    (" Minutes d'intensité cette semaine", plot_weekly_intensity(df,week_start, week_end)),
+    (" Intensité", plot_weekly_intensity(df,week_start, week_end)),
     (f"Répartition par type de sortie - {select_sport}", plot_repartition_run(df_week, sport_type=select_sport))
 ]
 
