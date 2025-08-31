@@ -3,6 +3,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from streamlit_folium import st_folium
 import math
+import io
 
 
 # Imports locaux
@@ -11,6 +12,7 @@ from eye_sight.params import DB_URI, TABLE_NAME
 from eye_sight.plots.plot_calendar_heat import plot_calendar
 from eye_sight.plots.basic_plots import *
 from eye_sight.plots.plot_map import *
+from eye_sight.plots.art import *
 
 
 # =========================

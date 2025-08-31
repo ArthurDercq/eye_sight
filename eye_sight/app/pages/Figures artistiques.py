@@ -1,5 +1,6 @@
 from eye_sight.app.app import *
 
+
 # =========================
 # THEME CONFIG
 # =========================
@@ -37,7 +38,6 @@ st.markdown(f"""
     }}
     """, unsafe_allow_html=True
 )
-
 
 # --- Dataframe ---
 
@@ -104,3 +104,30 @@ else:
     )
 
 st.markdown('<div class="section-space">', unsafe_allow_html=True)
+
+df_sorted = df.sort_values(by="start_date", ascending=False)
+
+activity_id = st.selectbox("Choisir l'activité à afficher", options=df_sorted["id"].tolist(),  # options = les ids réels
+    format_func=lambda x: df_sorted.loc[df_sorted["id"] == x, "name"].values[0],  # afficher le nom
+    index=0)
+
+selected_activity = df_sorted[df_sorted["id"] == activity_id]
+
+fig = create_latest_activity_poster(selected_activity)
+
+if fig is None:
+    st.warning("Aucune activité trouvée.")
+else:
+    #st.pyplot(fig)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png", dpi=300, bbox_inches="tight", facecolor="black")
+    buf.seek(0)
+
+    st.download_button(
+        label="📥 Télécharger l'affiche",
+        data=buf,
+        file_name="affiche_trail.png",
+        mime="image/png"
+    )
+    st.image(buf)
