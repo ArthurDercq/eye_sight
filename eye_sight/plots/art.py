@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import io
 import pandas as pd
 import math
+import contextily as ctx
+import geopandas as gpd
+from shapely.geometry import LineString
 
 
 def create_latest_activity_poster(df):
@@ -109,14 +112,124 @@ def create_latest_activity_poster(df):
 
 
 
-def plot_mini_maps_grid(df):
+def create_latest_activity_poster_test(df, sport_type, zoom_out=0.2):
+    """
+    Crée une affiche minimaliste (statique) de la dernière activité avec fond map noir/blanc.
+    zoom_out : marge ajoutée autour du tracé (0.2 = 20%)
+    """
+
+    df_sport = df[df['sport_type'] == sport_type]
+
+    if df_sport.empty:
+        print("Aucune activité Trail trouvée.")
+        return None
+
+    # Trier par date décroissante
+    df_sorted = df_sport.sort_values('start_date', ascending=False)
+    latest_activity = df_sorted.iloc[0]
+
+    latest_activity_date = pd.to_datetime(latest_activity["start_date"])
+    latest_activity_date_str = latest_activity_date.strftime("%d/%m/%Y")
+
+    # Charger map
+    map_data = latest_activity['map']
+    if isinstance(map_data, str):
+        try:
+            map_data = json.loads(map_data)
+        except Exception as e:
+            print(f"Erreur JSON dans map : {e}")
+            return None
+
+    # Extraire polyline
+    polyline_str = map_data.get("summary_polyline")
+    if not polyline_str:
+        print("Pas de polyline disponible.")
+        return None
+
+    coords = polyline.decode(polyline_str)
+
+    # Convertir coords (lat, lon) → (lon, lat)
+    line_coords = [(lon, lat) for lat, lon in coords]
+
+    # GeoDataFrame
+    gdf = gpd.GeoDataFrame(geometry=[LineString(line_coords)], crs="EPSG:4326")
+    gdf = gdf.to_crs(epsg=3857)
+
+    # Distance et temps
+    distance = latest_activity.get("distance", None)
+    elapsed_time = latest_activity.get("elapsed_time_hms", None)
+    dplus = latest_activity.get("total_elevation_gain", None)
+
+    # --- 🎨 Création affiche ---
+    fig, ax = plt.subplots(figsize=(8, 10))
+
+    # Plot polyline
+    gdf.plot(ax=ax, color="white", linewidth=1)
+
+    # --- 🔎 Gestion du dézoom ---
+    xmin, ymin, xmax, ymax = gdf.total_bounds
+    xmargin = (xmax - xmin) * zoom_out
+    ymargin = (ymax - ymin) * zoom_out
+    ax.set_xlim(xmin - xmargin, xmax + xmargin)
+    ax.set_ylim(ymin - ymargin, ymax + ymargin)
+
+    # Ajouter fond noir & blanc
+    ctx.add_basemap(ax, source=ctx.providers.CartoDB.DarkMatter, alpha=1)
+    ax.set_axis_off()
+
+    # Nom de l'activité en haut
+    fig.text(
+        0.5, 0.95,
+        latest_activity["name"],
+        ha="center", va="top",
+        color="white", fontsize=20, family="monospace"
+    )
+
+    # Ligne principale : distance, temps, D+
+    if distance is not None and elapsed_time is not None and dplus is not None:
+        fig.text(
+            0.5, 0.03,
+            f"{distance:.1f} km | {elapsed_time} | {dplus:.0f} m D+",
+            ha="center", va="bottom",
+            color="white", fontsize=16, family="monospace"
+        )
+
+    # Date en dessous
+    fig.text(
+        0.5, 0.015,
+        latest_activity_date_str,
+        ha="center", va="bottom",
+        color="white", fontsize=9, family="monospace"
+    )
+
+    # Export
+    plt.savefig("affiche_trail_ctx.png", dpi=300, bbox_inches="tight", facecolor="black")
+
+    return fig
+
+
+
+def plot_mini_maps_grid(df, year, sport):
+
+    """
+    Crée un grid avec toutes les traces des activités
+
+    Args:
+        - df (pd.DataFrame): DataFrame avec une colonne 'map' (JSON string) et 'start_date' (datetime).
+        - l'année concernée (améliorer pour pouvoir prendre plusieurs années ?)
+        - une liste de sport à afficher
+
+    Returns:
+        un grid artistique
+    """
+
 
     plt.rcParams["figure.dpi"] = 300   # rendu à l'écran
 
     # --- Filtrage sur 2025 et Run/Trail ---
     df_filtered = df[
-        (pd.to_datetime(df["start_date"]).dt.year == 2025) &
-        (df["sport_type"].isin(["Run", "Trail"]))
+        (pd.to_datetime(df["start_date"]).dt.year == year) &
+        (df["sport_type"].isin(sport))
     ].copy()
 
     # --- Supprimer activités sans map ou polyline ---

@@ -47,6 +47,16 @@ def create_latest_activity_map(df):
 
 def plot_mini_map(df):
 
+    """
+    Crée une carte Folium de la dernière activité selon start_date.
+
+    Args:
+        df (pd.DataFrame): DataFrame avec une colonne 'map' (JSON string) et 'start_date' (datetime).
+
+    Returns:
+        la trace sur fond transparent d'une activité
+    """
+
     # Trier le DataFrame par date décroissante (la plus récente en premier)
     df_sorted = df.sort_values('start_date', ascending=False)
 
@@ -75,5 +85,3 @@ def plot_mini_map(df):
 
 
     return fig
-
-#B4B3E5

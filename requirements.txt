@@ -3,14 +3,14 @@ numpy
 seaborn
 matplotlib
 requests
-sqlite3
 dotenv
 sqlalchemy
 psycopg2
 datetime
-json
 streamlit
 calmap
-json
 polyline
 folium
+contextily
+geopandas
+shapely
