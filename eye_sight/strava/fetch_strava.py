@@ -7,7 +7,7 @@ from eye_sight.params import *
 
 
 # Fonction pour récupérer les données depuis l'API Strava
-def fetch_strava_data(after_date = None):
+def fetch_strava_data(after_date = None, return_header=False):
 
     payload = {
     'client_id': STRAVA_CLIENT_ID,
@@ -61,4 +61,36 @@ def fetch_strava_data(after_date = None):
 
     print("Données récupérées de l'API Strava ✅")
 
-    return activities_df
+    # Retour conditionnel
+    if return_header:
+        return activities_df, header
+    else:
+        return activities_df
+
+
+def fetch_streams(activity_id, header):
+
+    #Récupère les streams (altitude, distance, latlng, time) d'une activité
+
+    url = f"https://www.strava.com/api/v3/activities/{activity_id}/streams"
+    params = {"keys": "latlng,altitude,distance,time", "key_by_type": "true"}
+    resp = requests.get(url, headers=header, params=params)
+    resp.raise_for_status()
+    streams = resp.json()
+
+    latlng = streams.get("latlng", {}).get("data", [])
+    altitude = streams.get("altitude", {}).get("data", [])
+    distance = streams.get("distance", {}).get("data", [])
+    time = streams.get("time", {}).get("data", [])
+
+    # Construction DataFrame
+    df_stream = pd.DataFrame({
+        "activity_id": activity_id,
+        "lat": [pt[0] for pt in latlng] if latlng else None,
+        "lon": [pt[1] for pt in latlng] if latlng else None,
+        "altitude": altitude,
+        "distance_m": distance,
+        "time_s": time
+    })
+
+    return df_stream
