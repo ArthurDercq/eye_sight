@@ -131,3 +131,9 @@ else:
         mime="image/png"
     )
     st.image(buf)
+
+
+
+
+fig2 = plot_mini_maps_grid(df)
+st.pyplot(fig2)

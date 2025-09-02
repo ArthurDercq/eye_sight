@@ -3,6 +3,8 @@ import polyline
 import matplotlib.pyplot as plt
 import io
 import pandas as pd
+import math
+
 
 def create_latest_activity_poster(df):
     """
@@ -17,6 +19,9 @@ def create_latest_activity_poster(df):
                            - 'elapsed_time_hms' (formatée)
         save_path (str): chemin d'export de l'image finale (PNG).
     """
+
+    plt.rcParams["figure.dpi"] = 300   # rendu à l'écran
+
     if df.empty:
         print("Df empty")
         return None
@@ -98,5 +103,57 @@ def create_latest_activity_poster(df):
             family="monospace"
         )
 
+
+    return fig
+
+
+
+
+def plot_mini_maps_grid(df):
+
+    plt.rcParams["figure.dpi"] = 300   # rendu à l'écran
+
+    # --- Filtrage sur 2025 et Run/Trail ---
+    df_filtered = df[
+        (pd.to_datetime(df["start_date"]).dt.year == 2025) &
+        (df["sport_type"].isin(["Run", "Trail"]))
+    ].copy()
+
+    # --- Supprimer activités sans map ou polyline ---
+    df_filtered = df_filtered[
+        df_filtered["map"].apply(lambda x: bool(json.loads(x).get("summary_polyline")))
+    ]
+
+    # Trier du plus ancien au plus récent
+    df_filtered = df_filtered.sort_values("start_date", ascending=True)
+
+    n = len(df_filtered)
+    if n == 0:
+        print("Aucune activité Run ou Trail en 2025 avec polyline")
+        return None
+
+    # --- Calcul grille dynamique ---
+    n_cols = math.ceil(math.sqrt(n))
+    n_rows = math.ceil(n / n_cols)
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols, n_rows), gridspec_kw={"wspace": 0.5, "hspace": 0.5})
+    axes = axes.flatten()
+
+    for i, (_, activity) in enumerate(df_filtered.iterrows()):
+        try:
+            map_json = json.loads(activity["map"])
+            polyline_str = map_json.get("summary_polyline")
+            coords = polyline.decode(polyline_str)
+            lats, lons = zip(*coords)
+
+            axes[i].plot(lons, lats, color="black", linewidth=0.3)
+            axes[i].axis("off")
+            axes[i].set_aspect("equal")
+        except Exception as e:
+            print(f"Erreur activité {activity['activity_id']}: {e}")
+
+    # Cases vides (si grille > n)
+    for j in range(i+1, len(axes)):
+        axes[j].axis("off")
 
     return fig
