@@ -161,3 +161,17 @@ fig2 = plot_mini_maps_grid(df, 2025, ["Run", "Trail"])
 st.pyplot(fig2)
 
 st.markdown('</div>', unsafe_allow_html=True)
+
+
+# =========================
+# Grid des elevation d'actis
+# =========================
+st.markdown("<div class='title'>Profils d'activités </div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitlt'> ➡️ Run & Trail </div>", unsafe_allow_html=True)
+
+st.markdown('<div class="section-space">', unsafe_allow_html=True)
+
+fig3 = plot_trail_profiles_db(n=30)
+st.pyplot(fig3)
+
+st.markdown('</div>', unsafe_allow_html=True)

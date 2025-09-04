@@ -7,6 +7,9 @@ import math
 import contextily as ctx
 import geopandas as gpd
 from shapely.geometry import LineString
+from sqlalchemy import create_engine
+from eye_sight.params import DB_URI
+
 
 
 def create_latest_activity_poster(df):
@@ -110,8 +113,6 @@ def create_latest_activity_poster(df):
     return fig
 
 
-
-
 def create_latest_activity_poster_test(df, sport_type, zoom_out=0.2):
     """
     Crée une affiche minimaliste (statique) de la dernière activité avec fond map noir/blanc.
@@ -208,7 +209,6 @@ def create_latest_activity_poster_test(df, sport_type, zoom_out=0.2):
     return fig
 
 
-
 def plot_mini_maps_grid(df, year, sport):
 
     """
@@ -268,5 +268,88 @@ def plot_mini_maps_grid(df, year, sport):
     # Cases vides (si grille > n)
     for j in range(i+1, len(axes)):
         axes[j].axis("off")
+
+    return fig
+
+
+
+def get_latest_run_trail_activity_ids(db_uri, table_name="activites", n=100):
+    """
+    Récupère les n derniers activity_id des activités Run et Trail depuis la table activites.
+    """
+    engine = create_engine(db_uri)
+    query = f"""
+        SELECT id
+        FROM {table_name}
+        WHERE sport_type IN ('Run', 'Trail')
+        ORDER BY start_date DESC
+        LIMIT {n}
+    """
+    df_ids = pd.read_sql(query, engine)
+    # Convertir en string pour la requête sur streams
+    return [str(i) for i in df_ids["id"].tolist()]
+
+
+def fetch_streams_for_activity_ids(activity_ids, db_uri, table_name="streams"):
+    """
+    Récupère tous les streams pour une liste d'activity_id depuis PostgreSQL.
+    Retourne un DataFrame avec toutes les données.
+    """
+    engine = create_engine(db_uri)
+    # Crée une requête SQL avec IN (...)
+    placeholders = ','.join(['%s'] * len(activity_ids))
+    query = f"""
+        SELECT lat, lon, altitude, distance_m, time_s, activity_id
+        FROM {table_name}
+        WHERE activity_id IN ({placeholders})
+        ORDER BY activity_id, time_s
+    """
+    df_streams = pd.read_sql(query, engine, params=tuple(activity_ids))
+    return df_streams
+
+
+
+
+def plot_trail_profiles_df(df_streams, n_cols=5):
+    """
+    Trace les profils de dénivelé en version minimaliste artistique à partir du DataFrame des streams.
+
+    Args:
+        df_streams (pd.DataFrame): doit contenir 'activity_id', 'distance_m', 'altitude'
+        n_cols (int): nombre de colonnes dans la grille
+    """
+    activity_ids = df_streams["activity_id"].unique()
+    n_activities = len(activity_ids)
+    if n_activities == 0:
+        print("Aucune donnée à tracer.")
+        return
+
+    n_rows = math.ceil(n_activities / n_cols)
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4*n_cols, 2.5*n_rows), gridspec_kw={"wspace": 0.5, "hspace": 0.5})
+    axes = axes.flatten()
+
+    for i, activity_id in enumerate(activity_ids):
+        data = df_streams[df_streams["activity_id"] == activity_id]
+        ax = axes[i]
+        ax.plot(data["distance_m"] / 1000, data["altitude"], color="black", linewidth=1)
+        #ax.fill_between(data["distance_m"] / 1000, data["altitude"], alpha=0.2, color="gray")
+        ax.axis("off")
+
+    # Supprimer axes vides
+    for j in range(n_activities, len(axes)):
+        fig.delaxes(axes[j])
+
+    return fig
+
+
+def plot_trail_profiles_db(n):
+
+    # 1. Récupère les IDs d'activités choisis
+    activity_ids = get_latest_run_trail_activity_ids(DB_URI, n=n)
+
+    # 2. Récupère tous les streams liés à ces IDs
+    df_streams = fetch_streams_for_activity_ids(activity_ids, DB_URI)
+
+    fig = plot_trail_profiles_df(df_streams)
 
     return fig

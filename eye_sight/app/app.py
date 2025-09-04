@@ -7,7 +7,7 @@ import io
 
 
 # Imports locaux
-from eye_sight.update_database import update_database
+from eye_sight.update_database import update_database, update_streams_database
 from eye_sight.params import DB_URI, TABLE_NAME
 from eye_sight.plots.plot_calendar_heat import plot_calendar
 from eye_sight.plots.basic_plots import *
@@ -54,8 +54,10 @@ st.markdown("<div class='main-title'>Mon journal d’entraînement</div>", unsaf
 
 # --- Refresh bouton ---
 if st.button("Rafraîchir mes données"):
-    message = update_database()
-    st.info(message, icon="🔽")
+    message_activities = update_database()
+    message_streams = update_streams_database()
+    st.info(message_activities, icon="🔽")
+    st.info(message_streams, icon="🔽")
     load_data.clear()
     df = load_data()
 else:
