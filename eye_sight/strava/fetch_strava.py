@@ -3,8 +3,22 @@ import pandas as pd
 from pandas import Timestamp
 from datetime import datetime
 from eye_sight.params import *
+import time
+from sqlalchemy import create_engine
 
 
+def get_strava_header():
+    payload = {
+        'client_id': STRAVA_CLIENT_ID,
+        'client_secret': STRAVA_CLIENT_SECRET,
+        'refresh_token': STRAVA_REFRESH_TOKEN,
+        'grant_type': "refresh_token",
+        'f': 'json'
+    }
+    res = requests.post(AUTH_URL, data=payload, verify=False)
+    access_token = res.json()['access_token']
+    header = {'Authorization': 'Bearer ' + access_token}
+    return header
 
 # Fonction pour récupérer les données depuis l'API Strava
 def fetch_strava_data(after_date = None, return_header=False):
@@ -68,7 +82,23 @@ def fetch_strava_data(after_date = None, return_header=False):
         return activities_df
 
 
-def fetch_streams(activity_id, header):
+
+
+
+def get_all_activity_ids_from_db(db_uri, table_name):
+    """
+    Récupère tous les activity_id présents dans la base PostgreSQL.
+    Retourne une liste de strings.
+    """
+    engine = create_engine(db_uri)
+    with engine.connect() as conn:
+        df = pd.read_sql(f"SELECT id FROM {table_name}", conn)
+
+    print("Ids récupérés ✅")
+    return df["id"].astype(str).tolist()
+
+
+def fetch_stream(activity_id, header):
 
     #Récupère les streams (altitude, distance, latlng, time) d'une activité
 
@@ -92,5 +122,35 @@ def fetch_streams(activity_id, header):
         "distance_m": distance,
         "time_s": time
     })
+    print(f"Stream de l'activité {activity_id} récupéré ✅")
 
     return df_stream
+
+
+def fetch_multiple_streams_df(activity_ids, header, max_per_15min=590):
+    dfs = []
+    count = 0
+    no_stream_ids = []
+    for i, activity_id in enumerate(activity_ids):
+        if count >= max_per_15min:
+            print("⏸ Pause 15 minutes pour respecter la limite Strava…")
+            time.sleep(15 * 60)
+            count = 0
+        try:
+            df_stream = fetch_stream(activity_id, header)
+            # Ignore si l'une des 4 colonnes est entièrement vide ou NaN
+            cols = ["altitude", "distance_m", "lat", "lon"]
+            if df_stream.empty or any(df_stream[col].isna().all() or df_stream[col].isnull().all() for col in cols):
+                no_stream_ids.append(activity_id)
+            else:
+                dfs.append(df_stream)
+            count += 1
+        except Exception as e:
+            print(f"Erreur pour l'activité {activity_id}: {e}")
+            no_stream_ids.append(activity_id)
+    if dfs:
+        result = pd.concat(dfs, ignore_index=True)
+    else:
+        result = pd.DataFrame()
+    print(f"{len(no_stream_ids)} activités sans stream (ignorées).")
+    return result

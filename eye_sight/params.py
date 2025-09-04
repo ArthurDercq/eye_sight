@@ -26,5 +26,7 @@ PASSWORD = os.getenv("PASSWORD")
 PORT = os.getenv("PORT")
 
 TABLE_NAME = os.getenv("TABLE_NAME")
+TABLE_NAME2 = os.getenv("TABLE_NAME2")
+
 
 DB_URI = os.getenv("DB_URI")

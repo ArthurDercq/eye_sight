@@ -4,43 +4,28 @@ from eye_sight.app.app import *
 # =========================
 # THEME CONFIG
 # =========================
-THEME = {
-    "font": "Poppins, sans-serif",
-    "title_color": "#1E3A8A",   # bleu foncé
-    "subtitle_color" : "#3F589B",
-    "kpi_bg": "#E0F2FE",        # bleu clair
-    "progress": "#000000",
-    "box_radius": "20px",
-    "shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
-}
 
-# Inject custom CSS
-st.markdown(f"""
-    <style>
-    * {{
-        font-family: {THEME["font"]};
-    }}
-    /* Réduire l’espace en haut de page */
-    .css-18e3th9 {{
-        padding-top: 0rem;
-        padding-bottom: 0rem;
-    }}
-
-    /* Si besoin, ajuster aussi le padding du contenu principal */
-    .block-container {{
-        padding-top: 1.5rem;  /* met un petit padding minime */
-    }}
-    .title {{
-        color: {THEME["title_color"]};
-        font-weight: bold;
-        font-size: 1.4rem;
-        margin: 0.5rem 0;
-    }}
-    """, unsafe_allow_html=True
+st.set_page_config(
+    page_title="Artistic graphs",
+    page_icon=":bar_chart:",
+    layout="wide"
 )
 
-# --- Dataframe ---
+# =========================
+# Charge le CSS externe
+# =========================
 
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+load_css("eye_sight/app/style.css")
+
+
+
+# =========================
+# PARAMS DATAFRAME
+# =========================
 # Colonnes à afficher
 cols = [
     "start_date","name", "sport_type", "distance", "moving_time_hms",
@@ -88,10 +73,16 @@ df_formatted = df_formatted.rename(columns={
 })
 
 
-# Affichage
+# =========================
+# DATAFRAME jolie
+# =========================
 
 st.markdown('<div class="section-space">', unsafe_allow_html=True)
-st.markdown("<div class='title'>Mes activités</div>", unsafe_allow_html=True)
+st.markdown("<div class='main-title'>Mes activités</div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.divider()
+
 st.markdown('<div class="section-space">', unsafe_allow_html=True)
 
 if df.empty:
@@ -103,7 +94,22 @@ else:
         hide_index=True
     )
 
+st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
+
+
+
+# =========================
+# Poster dernière acti
+# =========================
+
 st.markdown('<div class="section-space">', unsafe_allow_html=True)
+
+st.markdown("<div class='title'>Poster d'une activité</div>", unsafe_allow_html=True)
+
 
 df_sorted = df.sort_values(by="start_date", ascending=False)
 
@@ -113,6 +119,8 @@ activity_id = st.selectbox("Choisir l'activité à afficher", options=df_sorted[
 
 selected_activity = df_sorted[df_sorted["id"] == activity_id]
 
+
+
 fig = create_latest_activity_poster(selected_activity)
 
 if fig is None:
@@ -121,7 +129,7 @@ else:
     #st.pyplot(fig)
 
     buf = io.BytesIO()
-    plt.savefig(buf, format="png", dpi=300, bbox_inches="tight", facecolor="black")
+    plt.savefig(buf, format="png", dpi=500, bbox_inches="tight", facecolor="black")
     buf.seek(0)
 
     st.download_button(
@@ -132,8 +140,24 @@ else:
     )
     st.image(buf)
 
+st.markdown('</div>', unsafe_allow_html=True)
 
 
 
-fig2 = plot_mini_maps_grid(df)
+
+# =========================
+# Grid des traces d'actis
+# =========================
+
+st.markdown("<div class='title'>Traces d'activités 2025</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitlt'> ➡️ Run & Trail </div>", unsafe_allow_html=True)
+
+
+
+st.markdown('<div class="section-space">', unsafe_allow_html=True)
+
+
+fig2 = plot_mini_maps_grid(df, 2025, ["Run", "Trail"])
 st.pyplot(fig2)
+
+st.markdown('</div>', unsafe_allow_html=True)

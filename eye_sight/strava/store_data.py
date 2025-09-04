@@ -137,3 +137,59 @@ def store_df_in_postgresql(df, host, database, user, password, port):
     cur.close()
 
     print("Données importées dans PostgreSQL ✅")
+
+
+def store_df_streams_in_postgresql(df_streams, host, database, user, password, port, table_name="streams"):
+    """
+    Stocke un DataFrame de streams Strava dans une table PostgreSQL.
+    """
+    conn = connect(
+        host=host,
+        database=database,
+        user=user,
+        password=password,
+        port=port
+    )
+    cur = conn.cursor()
+
+    # Création de la table si elle n'existe pas
+    create_table_query = sql.SQL("""
+    CREATE TABLE IF NOT EXISTS {} (
+        activity_id VARCHAR(50),
+        lat FLOAT,
+        lon FLOAT,
+        altitude FLOAT,
+        distance_m FLOAT,
+        time_s FLOAT
+    );
+    """).format(sql.Identifier(table_name))
+    cur.execute(create_table_query)
+
+    # Préparer les données à insérer
+    values = [
+        (
+            row['activity_id'],
+            row['lat'],
+            row['lon'],
+            row['altitude'],
+            row['distance_m'],
+            row['time_s']
+        )
+        for _, row in df_streams.iterrows()
+    ]
+
+    columns = ('activity_id', 'lat', 'lon', 'altitude', 'distance_m', 'time_s')
+
+    insert_query = sql.SQL("""
+        INSERT INTO {} ({})
+        VALUES %s
+        ON CONFLICT DO NOTHING
+    """).format(
+        sql.Identifier(table_name),
+        sql.SQL(', ').join(map(sql.Identifier, columns))
+    )
+
+    execute_values(cur, insert_query.as_string(conn), values)
+    conn.commit()
+    cur.close()
+    print("Streams importés dans PostgreSQL ✅")

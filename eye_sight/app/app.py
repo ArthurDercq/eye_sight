@@ -12,7 +12,7 @@ from eye_sight.params import DB_URI, TABLE_NAME
 from eye_sight.plots.plot_calendar_heat import plot_calendar
 from eye_sight.plots.basic_plots import *
 from eye_sight.plots.plot_map import *
-from eye_sight.plots.art import *
+from eye_sight.plots.plot_art import *
 
 
 # =========================
@@ -24,132 +24,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# =========================
-# THEME CONFIG
-# =========================
-THEME = {
-    "font": "Poppins, sans-serif",
-    "title-color": "#1E3A8A",   # bleu foncé
-    "subtitle_color" : "#3F589B",
-    "box_title_color" : "#E5E7EB",
-    "box-element-label-color":"#D1D5DB",
-    "kpi_bg": "#E0F2FE",        # bleu clair
-    "progress": "#000000",
-    "background-color":"#1F2934",
-    "box_radius": "10px",
-    "shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
-}
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Custom CSS
-st.markdown(f"""
-    <style>
-    * {{
-        font-family: {THEME["font"]};
-    }}
-    /* Réduire l’espace en haut de page */
-    .css-18e3th9 {{
-        padding-top: 0rem;
-        padding-bottom: 0rem;
-    }}
-
-    /* Si besoin, ajuster aussi le padding du contenu principal */
-    .block-container {{
-        padding-top: 3.5rem;  /* met un petit padding minime */
-    }}
-
-    /* Titre principal */
-    .main-title {{
-        font-size: 2.8rem;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: {THEME["background-color"]};
-    }}
-    /* Bouton personnalisé */
-    div.stButton > button:first-child {{
-        background-color: rgba(31, 41, 52, 0.4);
-        color: #E5E7EB;
-        border: 1px solid #1F2934;
-        border-radius: 10px;
-        padding: 10px 20px;
-        font-weight: 500;
-        cursor: pointer;
-    }}
-    div.stButton > button:first-child:hover {{
-        background-color: {THEME["background-color"]};
-        color: #ffffff;
-    }}
-    .stProgress > div > div > div > div {{
-        background-color: #6466EA !important;
-    }}
-    .bento-box {{
-        background-color: {THEME["background-color"]};
-        border-radius: {THEME["box_radius"]};
-        box-shadow: {THEME["shadow"]};
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }}
-    .kpi-box {{
-        background-color: {THEME["kpi_bg"]};
-        text-align: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-    }}
-    .title {{
-        color: {THEME["title-color"]};
-        font-weight: bold;
-        font-size: 1.4rem;
-        margin: 0.5rem 0;
-    }}
-    .box-title {{
-        color: {THEME["box_title_color"]};
-        font-weight: bold;
-        font-size: 1.4rem;
-        margin: 0.5rem 0;
-    }}
-    .box-element {{
-        color: {THEME["box_title_color"]};
-        font-weight: normal;
-        font-size: 1rem;
-        margin: 0.5rem 0;
-    }}
-    .box-label {{
-        font-size:0.6rem;
-        font-weight:200;
-        color:{THEME["box-element-label-color"]};
-        margin-right:8px;
-    }}
-    .subtitle {{
-        color: {THEME["subtitle_color"]};
-        font-weight: 400;
-        font-size: 1rem;
-        margin: 0.25rem 0 0.75rem 0;
-    }}
-    .progress {{
-        color: {THEME["progress"]};
-    }}
-    .section-space {{ margin-top: 2rem; margin-bottom: 2rem; }}
-
-    /* Section accomplissements */
-    .accomplishments {{
-        color: {THEME["box_title_color"]};
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        background-color: #1F2934;
-        padding: 20px;
-        border-radius: 12px;
-        margin-top: 30px;
-        font-size: 1.2rem;
-    }}
-    .accomplishments div {{
-        text-align: center;
-    }}
-    .accomplishments .number {{
-        font-size: 2rem;
-        font-weight: 600;
-    }}
-    </style>
-""", unsafe_allow_html=True)
+# Charge le CSS externe
+load_css("eye_sight/app/style.css")
 
 
 
@@ -171,14 +51,17 @@ def load_data():
 
 st.markdown("<div class='main-title'>Mon journal d’entraînement</div>", unsafe_allow_html=True)
 
+
 # --- Refresh bouton ---
 if st.button("Rafraîchir mes données"):
     message = update_database()
-    st.success(message, icon="🔥")
+    st.info(message, icon="🔽")
     load_data.clear()
     df = load_data()
 else:
     df = load_data()
+
+st.divider()
 
 # =========================
 # SIDEBAR

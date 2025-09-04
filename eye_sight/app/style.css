@@ -1,0 +1,106 @@
+/* style.css */
+* {
+    font-family: Poppins, sans-serif;
+}
+
+.block-container {
+    padding-top: 3.5rem;
+}
+
+/* Titre principal */
+.main-title {
+    font-size: 2.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #1F2934;
+}
+
+/* Boutons */
+div.stButton > button:first-child {
+    background-color: rgba(31, 41, 52, 0.4);
+    color: #E5E7EB;
+    border: 1px solid #1F2934;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+}
+div.stButton > button:first-child:hover {
+    background-color: #1F2934;
+    color: #ffffff;
+}
+
+/* Progress bar */
+.stProgress > div > div > div > div {
+    background-color: #6466EA !important;
+}
+
+/* Boxes */
+.bento-box {
+    background-color: #1F2934;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.kpi-box {
+    background-color: #E0F2FE;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Titres et labels */
+.title {
+    color: #1E3A8A;
+    font-weight: bold;
+    font-size: 1.4rem;
+    margin: 0.5rem 0;
+}
+.subtitle {
+    color: #3F589B;
+    font-weight: 400;
+    font-size: 1rem;
+    margin: 0.25rem 0 0.75rem 0;
+}
+.box-title {
+    color: #E5E7EB;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+.box-element {
+    color: #E5E7EB;
+    font-size: 1rem;
+}
+.box-label {
+    font-size: 0.6rem;
+    font-weight: 200;
+    color: #D1D5DB;
+    margin-right: 8px;
+}
+
+/* Section spacing */
+.section-space {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Accomplissements */
+.accomplishments {
+    color: #E5E7EB;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #1F2934;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 30px;
+    font-size: 1.2rem;
+}
+.accomplishments div {
+    text-align: center;
+}
+.accomplishments .number {
+    font-size: 2rem;
+    font-weight: 600;
+}
